@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import type { AuditEvent, ConfigPayload, GovernedResponse, ResponseMode, Trace } from "@/lib/types";
 
 const defaultQuery = "Can I work remotely from another state for 3 months?";
@@ -30,11 +30,6 @@ export default function Home() {
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState("");
 
-  useEffect(() => {
-    void loadConfig();
-    void loadAudits();
-  }, []);
-
   const role = useMemo(() => config?.roles.find((item) => item.id === selectedRole), [config, selectedRole]);
 
   async function loadConfig() {
@@ -44,12 +39,17 @@ export default function Home() {
     setDraftConfig(structuredClone(payload));
   }
 
-  async function loadAudits(code = passcode) {
+  const loadAudits = useCallback(async (code = passcode) => {
     const response = await fetch("/api/audit", { headers: { "x-demo-passcode": code } });
     if (!response.ok) return;
     const payload = (await response.json()) as { events: AuditEvent[] };
     setAudits(payload.events);
-  }
+  }, [passcode]);
+
+  useEffect(() => {
+    void loadConfig();
+    void loadAudits();
+  }, [loadAudits]);
 
   async function ask(event: FormEvent) {
     event.preventDefault();

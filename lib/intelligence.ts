@@ -261,11 +261,14 @@ function extractOutputText(response: Record<string, unknown>) {
   const output = response.output;
   if (!Array.isArray(output)) return "";
   return output
-    .flatMap((item) => {
-      if (!item || typeof item !== "object" || !("content" in item) || !Array.isArray(item.content)) return [];
-      return item.content.map((content) => {
-        if (!content || typeof content !== "object") return "";
-        if ("text" in content && typeof content.text === "string") return content.text;
+    .flatMap((item: unknown) => {
+      if (!item || typeof item !== "object" || !("content" in item)) return [];
+      const contentList = (item as { content?: unknown }).content;
+      if (!Array.isArray(contentList)) return [];
+      return contentList.map((content: unknown) => {
+        if (!content || typeof content !== "object" || !("text" in content)) return "";
+        const text = (content as { text?: unknown }).text;
+        if (typeof text === "string") return text;
         return "";
       });
     })
