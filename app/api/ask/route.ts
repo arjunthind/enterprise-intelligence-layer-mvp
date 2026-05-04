@@ -4,11 +4,11 @@ import { buildErrorResponse, findRole, generateComparison, getModel, summarizePr
 import type { AuditEvent } from "@/lib/types";
 
 export async function POST(request: Request) {
+  const body = (await request.json()) as { query?: string; roleId?: string; mode?: "demo" | "live" | "auto" };
   const passcode = request.headers.get("x-demo-passcode");
-  if (process.env.DEMO_PASSCODE && passcode !== process.env.DEMO_PASSCODE) {
+  if (process.env.DEMO_PASSCODE && body.mode !== "demo" && passcode !== process.env.DEMO_PASSCODE) {
     return NextResponse.json({ error: "Invalid demo passcode." }, { status: 401 });
   }
-  const body = (await request.json()) as { query?: string; roleId?: string; mode?: "demo" | "live" | "auto" };
   const query = body.query?.trim();
   if (!query || !body.roleId) {
     return NextResponse.json({ error: "query and roleId are required." }, { status: 400 });

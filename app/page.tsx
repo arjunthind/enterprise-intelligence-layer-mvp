@@ -53,6 +53,10 @@ export default function Home() {
 
   async function ask(event: FormEvent) {
     event.preventDefault();
+    if (mode !== "demo" && !passcode) {
+      setStatus("Enter the demo passcode to use Auto fallback or Live AI. Demo mode runs without a passcode.");
+      return;
+    }
     setLoading(true);
     setStatus("Assembling tenant rules, role guidance, policy context, and schema...");
     setResult(null);
@@ -70,7 +74,7 @@ export default function Home() {
         : "Live AI request failed; auditable fallback captured."
     );
     setLoading(false);
-    await loadAudits(passcode);
+    if (passcode) await loadAudits(passcode);
   }
 
   async function saveConfig() {
@@ -127,12 +131,12 @@ export default function Home() {
           </button>
         </nav>
         <label className="passcode">
-          Demo passcode
+          Passcode for Admin, Audit, and Live AI
           <input
             type="password"
             value={passcode}
             onChange={(event) => setPasscode(event.target.value)}
-            placeholder="Enter before running or auditing"
+            placeholder="Optional for Demo mode"
           />
         </label>
         <div className="tenant-card">
@@ -245,6 +249,9 @@ function DemoView({
             Live AI
           </button>
         </div>
+        <p className="mode-note">
+          Demo mode is open for quick review. Passcode is only needed for Admin, Audit, Auto fallback, or Live AI.
+        </p>
         <label>
           User request
           <textarea value={query} onChange={(event) => setQuery(event.target.value)} rows={4} />
