@@ -64,6 +64,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState("");
+  const [scenarioOpen, setScenarioOpen] = useState(false);
 
   const role = useMemo(() => config?.roles.find((item) => item.id === selectedRole), [config, selectedRole]);
 
@@ -168,8 +169,13 @@ export default function Home() {
       <section className="workspace">
         <header className="topbar">
           <div>
-            <p className="eyebrow">{activeView === "demo" ? "HR Policy Assistant" : activeView === "admin" ? "Control Plane" : "Governance Log"}</p>
-            <h2>{activeView === "demo" ? "Compare Generic AI vs Governed AI" : activeView === "admin" ? "Tenant Rulebook and Agent Controls" : "Auditable AI Interactions"}</h2>
+            <p className="eyebrow">{activeView === "demo" ? "Selected Agent: HR Policy Assistant" : activeView === "admin" ? "Control Plane" : "Governance Log"}</p>
+            <h2>{activeView === "demo" ? "Turn Generic AI Into Governed Enterprise Guidance" : activeView === "admin" ? "Tenant Rulebook and Agent Controls" : "Auditable AI Interactions"}</h2>
+            {activeView === "demo" ? (
+              <p className="topbar-copy">
+                This MVP uses HR as the first proof-of-value agent to demonstrate tenant context, role awareness, policy retrieval, and structured governance.
+              </p>
+            ) : null}
           </div>
           <div className="model-pill">Model: {result?.trace?.model || "gpt-5.2"}</div>
         </header>
@@ -188,6 +194,8 @@ export default function Home() {
             setRoleId={setSelectedRole}
             setQuery={setQuery}
             setMode={setMode}
+            scenarioOpen={scenarioOpen}
+            setScenarioOpen={setScenarioOpen}
             ask={ask}
           />
         ) : null}
@@ -220,6 +228,8 @@ function DemoView({
   setRoleId,
   setQuery,
   setMode,
+  scenarioOpen,
+  setScenarioOpen,
   ask
 }: {
   config: ConfigPayload;
@@ -232,33 +242,19 @@ function DemoView({
   setRoleId: (roleId: string) => void;
   setQuery: (query: string) => void;
   setMode: (mode: "demo" | "live") => void;
+  scenarioOpen: boolean;
+  setScenarioOpen: (open: boolean) => void;
   ask: (event: FormEvent) => Promise<void>;
 }) {
   return (
     <div className="stack">
       <form className="query-panel" onSubmit={ask}>
-        <section className="scenario-library" aria-label="Scenario library">
-          <div>
-            <p className="eyebrow">Scenario Library</p>
-            <h3>Pick a boardroom-ready test case</h3>
-          </div>
-          <div className="scenario-grid">
-            {scenarios.map((scenario) => (
-              <button
-                key={scenario.title}
-                type="button"
-                className={query === scenario.query && roleId === scenario.roleId ? "selected" : ""}
-                onClick={() => {
-                  setRoleId(scenario.roleId);
-                  setQuery(scenario.query);
-                }}
-              >
-                <strong>{scenario.title}</strong>
-                <span>{scenario.query}</span>
-              </button>
-            ))}
-          </div>
-        </section>
+        <div className="demo-actions">
+          <button type="button" className="secondary" onClick={() => setScenarioOpen(true)}>
+            Open Scenario Library
+          </button>
+          <span>Optional walkthrough prompts for reviewer demos</span>
+        </div>
         <div className="field-row">
           <label>
             Organization
@@ -302,6 +298,39 @@ function DemoView({
           {loading ? "Generating..." : "Run Intelligence Layer"}
         </button>
       </form>
+
+      {scenarioOpen ? (
+        <div className="scenario-overlay" role="dialog" aria-modal="true" aria-label="Scenario library">
+          <div className="scenario-modal">
+            <div className="modal-heading">
+              <div>
+                <p className="eyebrow">Scenario Library</p>
+                <h3>Pick a boardroom-ready test case</h3>
+              </div>
+              <button type="button" className="icon-button" onClick={() => setScenarioOpen(false)} aria-label="Close scenario library">
+                x
+              </button>
+            </div>
+            <div className="scenario-grid">
+              {scenarios.map((scenario) => (
+                <button
+                  key={scenario.title}
+                  type="button"
+                  className={query === scenario.query && roleId === scenario.roleId ? "selected" : ""}
+                  onClick={() => {
+                    setRoleId(scenario.roleId);
+                    setQuery(scenario.query);
+                    setScenarioOpen(false);
+                  }}
+                >
+                  <strong>{scenario.title}</strong>
+                  <span>{scenario.query}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <div className="comparison">
         <section className="panel">

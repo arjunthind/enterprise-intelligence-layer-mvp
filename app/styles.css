@@ -166,9 +166,19 @@ nav button.active {
 
 .topbar h2 {
   margin: 7px 0 0;
-  font-size: 30px;
+  max-width: 780px;
+  font-size: 34px;
   font-weight: 760;
+  line-height: 1.08;
   letter-spacing: 0;
+}
+
+.topbar-copy {
+  max-width: 760px;
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
 }
 
 .model-pill,
@@ -209,28 +219,86 @@ nav button.active {
   gap: 15px;
 }
 
-.scenario-library {
-  display: grid;
-  gap: 12px;
-  padding-bottom: 4px;
+.demo-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 2px;
 }
 
-.scenario-library h3 {
+.demo-actions span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.secondary,
+.icon-button {
+  border: 1px solid var(--line);
+  background: #ffffff;
+  color: var(--accent-strong);
+  font-weight: 780;
+  box-shadow: var(--shadow-soft);
+}
+
+.secondary {
+  border-radius: 999px;
+  padding: 9px 13px;
+}
+
+.icon-button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 999px;
+}
+
+.scenario-overlay {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  place-items: start center;
+  padding: 8vh 28px 28px;
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(10px);
+}
+
+.scenario-modal {
+  display: grid;
+  width: min(980px, 100%);
+  gap: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.46);
+  border-radius: 18px;
+  padding: 22px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.28);
+}
+
+.modal-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.modal-heading h3 {
   margin: 5px 0 0;
-  font-size: 17px;
-  font-weight: 750;
+  font-size: 22px;
+  font-weight: 760;
 }
 
 .scenario-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 
 .scenario-grid button {
   display: grid;
   gap: 6px;
-  min-height: 112px;
+  min-height: 126px;
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 12px;
