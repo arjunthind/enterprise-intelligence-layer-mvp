@@ -24,7 +24,7 @@ DATABASE_URL=
 
 `DATABASE_URL` should point to a Postgres database such as Vercel Postgres, Neon, or Supabase. If `DATABASE_URL` is omitted, the app uses in-memory demo storage for local UI review only.
 
-The app defaults to Demo mode in the UI so stakeholder walkthroughs remain reliable without API credits. Auto fallback attempts live OpenAI first and then uses deterministic demo output if quota, billing, or network access fails. Live AI forces a real API call. In production, Admin, Audit, and model execution would be protected by enterprise SSO and role-based access control; this MVP keeps access open to reduce reviewer friction.
+The app defaults to Demo mode in the UI so stakeholder walkthroughs remain reliable without API credits. Live AI calls OpenAI when API access and billing are configured. In production, Admin, Audit, and model execution would be protected by enterprise SSO and role-based access control; this MVP keeps access open to reduce reviewer friction.
 
 ## Run Locally
 

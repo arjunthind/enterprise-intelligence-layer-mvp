@@ -20,7 +20,7 @@ export default function Home() {
   const [draftConfig, setDraftConfig] = useState<ConfigPayload | null>(null);
   const [selectedRole, setSelectedRole] = useState("employee");
   const [query, setQuery] = useState(defaultQuery);
-  const [mode, setMode] = useState<"demo" | "auto" | "live">("demo");
+  const [mode, setMode] = useState<"demo" | "live">("demo");
   const [activeView, setActiveView] = useState<"demo" | "admin" | "audit">("demo");
   const [result, setResult] = useState<AskResult | null>(null);
   const [audits, setAudits] = useState<AuditEvent[]>([]);
@@ -65,7 +65,7 @@ export default function Home() {
     setResult(payload);
     setStatus(
       response.ok
-        ? `${payload.responseMode || "Governed"} response generated and audit event captured.`
+            ? `${payload.responseMode || "Governed"} response generated and audit event captured.`
         : "Live AI request failed; auditable fallback captured."
     );
     setLoading(false);
@@ -190,12 +190,12 @@ function DemoView({
   roleId: string;
   roleName: string;
   query: string;
-  mode: "demo" | "auto" | "live";
+  mode: "demo" | "live";
   result: AskResult | null;
   loading: boolean;
   setRoleId: (roleId: string) => void;
   setQuery: (query: string) => void;
-  setMode: (mode: "demo" | "auto" | "live") => void;
+  setMode: (mode: "demo" | "live") => void;
   ask: (event: FormEvent) => Promise<void>;
 }) {
   return (
@@ -219,20 +219,23 @@ function DemoView({
             </select>
           </label>
         </div>
-        <div className="mode-row" aria-label="Response mode">
-          <button type="button" className={mode === "demo" ? "selected" : ""} onClick={() => setMode("demo")}>
-            Demo mode
-          </button>
-          <button type="button" className={mode === "auto" ? "selected" : ""} onClick={() => setMode("auto")}>
-            Auto fallback
-          </button>
-          <button type="button" className={mode === "live" ? "selected" : ""} onClick={() => setMode("live")}>
-            Live AI
-          </button>
+        <div className="mode-control">
+          <div className="mode-row" aria-label="Response mode">
+            <button type="button" className={mode === "demo" ? "selected" : ""} onClick={() => setMode("demo")}>
+              Demo mode
+            </button>
+            <button type="button" className={mode === "live" ? "selected" : ""} onClick={() => setMode("live")}>
+              Live AI
+            </button>
+          </div>
+          <div className="info-bubble" tabIndex={0} aria-label="Mode information">
+            i
+            <div className="info-popover" role="tooltip">
+              <strong>Demo mode</strong> uses deterministic policy-backed responses for reliable stakeholder review.
+              <strong>Live AI</strong> calls OpenAI when API access and billing are configured.
+            </div>
+          </div>
         </div>
-        <p className="mode-note">
-          Demo mode is deterministic for reliable stakeholder review. Auto fallback and Live AI use the same runtime path when API access is configured.
-        </p>
         <label>
           User request
           <textarea value={query} onChange={(event) => setQuery(event.target.value)} rows={4} />
