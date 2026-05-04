@@ -151,9 +151,9 @@ The MVP response format includes:
 
 This structure improves trust because reviewers can see not only the answer, but why the answer was given and what limitations apply.
 
-### Admin Controls
+### Tenant Controls
 
-The Admin tab demonstrates no-code administrative control over the Intelligence Layer.
+The Tenant Controls tab demonstrates no-code administrative control over the active HR demo.
 
 An administrator can edit:
 
@@ -164,7 +164,7 @@ An administrator can edit:
 - Policy snippets
 - Agent purpose
 
-This supports one of the MVP’s key success criteria: administrative control without engineering changes.
+This supports one of the MVP’s key success criteria: tenant-level governance control without engineering changes. The Agent Registry defines reusable agent concepts, while Tenant Controls adjust how the active Northstar HR use case behaves.
 
 ### Audit Log
 

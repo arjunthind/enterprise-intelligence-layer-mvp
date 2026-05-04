@@ -254,10 +254,10 @@ export default function Home() {
             Demo
           </button>
           <button className={activeView === "agents" ? "active" : ""} onClick={() => setActiveView("agents")}>
-            Agents
+            Agent Registry
           </button>
           <button className={activeView === "admin" ? "active" : ""} onClick={() => setActiveView("admin")}>
-            Admin
+            Tenant Controls
           </button>
           <button className={activeView === "audit" ? "active" : ""} onClick={() => setActiveView("audit")}>
             Audit
@@ -273,8 +273,8 @@ export default function Home() {
       <section className="workspace">
         <header className="topbar">
           <div>
-            <p className="eyebrow">{activeView === "demo" ? "Selected Agent: HR Policy Assistant" : activeView === "agents" ? "Agent Registry" : activeView === "admin" ? "Control Plane" : "Governance Log"}</p>
-            <h2>{activeView === "demo" ? "Turn Generic AI Into Governed Enterprise Guidance" : activeView === "agents" ? "Build Reusable Governed AI Agents" : activeView === "admin" ? "Tenant Rulebook and Agent Controls" : "Auditable AI Interactions"}</h2>
+            <p className="eyebrow">{activeView === "demo" ? "Selected Agent: HR Policy Assistant" : activeView === "agents" ? "Use-Case Layer" : activeView === "admin" ? "Governance Controls" : "Governance Log"}</p>
+            <h2>{activeView === "demo" ? "Turn Generic AI Into Governed Enterprise Guidance" : activeView === "agents" ? "Agent Registry and Builder" : activeView === "admin" ? "Tenant Controls for the Active HR Demo" : "Auditable AI Interactions"}</h2>
             {activeView === "demo" ? (
               <p className="topbar-copy">
                 This MVP uses HR as the first proof-of-value agent to demonstrate tenant context, role awareness, policy retrieval, and structured governance.
@@ -283,6 +283,11 @@ export default function Home() {
             {activeView === "agents" ? (
               <p className="topbar-copy">
                 The registry shows how the Intelligence Layer can support repeatable agents defined by purpose, roles, approved sources, constraints, and output expectations.
+              </p>
+            ) : null}
+            {activeView === "admin" ? (
+              <p className="topbar-copy">
+                Tenant Controls govern the active Northstar HR demo: company rules, role guidance, approved policy content, and the current agent purpose.
               </p>
             ) : null}
           </div>
@@ -744,9 +749,10 @@ function AdminView({
       </section>
 
       <section className="panel">
-        <h3>Agent Settings</h3>
+        <h3>Active Agent Purpose</h3>
+        <p className="muted">This edits the purpose of the HR Policy Assistant used in the working demo. New agent concepts belong in the Agent Registry.</p>
         <label>
-          Purpose
+          HR Policy Assistant purpose
           <textarea
             value={draftConfig.agent.purpose}
             onChange={(event) => setDraftConfig({ ...draftConfig, agent: { ...draftConfig.agent, purpose: event.target.value } })}

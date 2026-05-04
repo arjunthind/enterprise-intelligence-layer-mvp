@@ -11,7 +11,7 @@ For a polished product write-up, see [Overview of MVP for Intelligence Layer Pla
 - Approved policy context retrieval
 - Agent Registry with a lightweight Create Agent preview flow
 - OpenAI Responses API calls with Structured Outputs
-- Admin-editable rule, role, policy, and agent settings
+- Tenant Controls for editing the active HR demo rulebook, role guidance, policy snippets, and agent purpose
 - Auditable interaction history
 - Hybrid execution: deterministic demo mode, live OpenAI mode, or automatic fallback
 
@@ -27,7 +27,7 @@ DATABASE_URL=
 
 `DATABASE_URL` should point to a Postgres database such as Vercel Postgres, Neon, or Supabase. If `DATABASE_URL` is omitted, the app uses in-memory demo storage for local UI review only.
 
-The app defaults to Demo mode in the UI so stakeholder walkthroughs remain reliable without API credits. Live AI calls OpenAI when API access and billing are configured. In production, Admin, Audit, and model execution would be protected by enterprise SSO and role-based access control; this MVP keeps access open to reduce reviewer friction.
+The app defaults to Demo mode in the UI so stakeholder walkthroughs remain reliable without API credits. Live AI calls OpenAI when API access and billing are configured. In production, Tenant Controls, Audit, and model execution would be protected by enterprise SSO and role-based access control; this MVP keeps access open to reduce reviewer friction.
 
 ## Run Locally
 
@@ -57,5 +57,5 @@ The app creates its Postgres tables automatically on first read/write:
 3. Run “Can I work remotely from another state for 3 months?”
 4. Compare Generic AI vs Governed AI.
 5. Review the Intelligence Layer Trace.
-6. Edit tenant rules or policy snippets on the Admin tab.
+6. Edit tenant rules or policy snippets on the Tenant Controls tab.
 7. Rerun the question and inspect the Audit tab.
