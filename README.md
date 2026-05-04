@@ -9,6 +9,7 @@ For a polished product write-up, see [Overview of MVP for Intelligence Layer Pla
 - Tenant rulebook injection
 - Role-aware response behavior
 - Approved policy context retrieval
+- Agent Registry with a lightweight Create Agent preview flow
 - OpenAI Responses API calls with Structured Outputs
 - Admin-editable rule, role, policy, and agent settings
 - Auditable interaction history

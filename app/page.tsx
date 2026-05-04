@@ -51,13 +51,62 @@ type AskResult = {
   error?: string;
 };
 
+type RegistryAgent = {
+  id: string;
+  name: string;
+  businessFunction: string;
+  purpose: string;
+  roles: string;
+  sources: string;
+  constraints: string;
+  outputFormat: string;
+  status: "Active MVP Agent" | "Configured Preview";
+};
+
+const previewAgents: RegistryAgent[] = [
+  {
+    id: "customer-support-preview",
+    name: "Customer Support Assistant",
+    businessFunction: "Customer Support",
+    purpose: "Draft consistent, policy-aware answers for customer service teams.",
+    roles: "Support Rep, Escalation Manager, QA Lead",
+    sources: "Help center, refund policy, escalation playbook",
+    constraints: "Avoid unauthorized refunds, legal promises, and unsupported troubleshooting claims.",
+    outputFormat: "Answer, policy rationale, customer-safe wording, escalation path",
+    status: "Configured Preview"
+  },
+  {
+    id: "compliance-preview",
+    name: "Compliance Advisor",
+    businessFunction: "Compliance",
+    purpose: "Help internal teams identify policy obligations and escalation triggers.",
+    roles: "Employee, Compliance Analyst, Department Lead",
+    sources: "Code of conduct, regulatory policy, exception register",
+    constraints: "Do not provide legal conclusions; flag high-risk requests for review.",
+    outputFormat: "Guidance, policy reference, risk level, required review",
+    status: "Configured Preview"
+  }
+];
+
+const emptyAgentDraft: RegistryAgent = {
+  id: "",
+  name: "",
+  businessFunction: "",
+  purpose: "",
+  roles: "",
+  sources: "",
+  constraints: "",
+  outputFormat: "Answer, rationale, source references, risks, next steps",
+  status: "Configured Preview"
+};
+
 export default function Home() {
   const [config, setConfig] = useState<ConfigPayload | null>(null);
   const [draftConfig, setDraftConfig] = useState<ConfigPayload | null>(null);
   const [selectedRole, setSelectedRole] = useState("employee");
   const [query, setQuery] = useState(defaultQuery);
   const [mode, setMode] = useState<"demo" | "live">("demo");
-  const [activeView, setActiveView] = useState<"demo" | "admin" | "audit">("demo");
+  const [activeView, setActiveView] = useState<"demo" | "agents" | "admin" | "audit">("demo");
   const [result, setResult] = useState<AskResult | null>(null);
   const [audits, setAudits] = useState<AuditEvent[]>([]);
   const [selectedAudit, setSelectedAudit] = useState<AuditEvent | null>(null);
@@ -65,6 +114,8 @@ export default function Home() {
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState("");
   const [scenarioOpen, setScenarioOpen] = useState(false);
+  const [customAgents, setCustomAgents] = useState<RegistryAgent[]>([]);
+  const [agentDraft, setAgentDraft] = useState<RegistryAgent>(emptyAgentDraft);
 
   const role = useMemo(() => config?.roles.find((item) => item.id === selectedRole), [config, selectedRole]);
 
@@ -86,6 +137,34 @@ export default function Home() {
     void loadConfig();
     void loadAudits();
   }, [loadAudits]);
+
+  useEffect(() => {
+    const savedAgents = window.localStorage.getItem("intelligence-layer-agents");
+    if (savedAgents) setCustomAgents(JSON.parse(savedAgents) as RegistryAgent[]);
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("intelligence-layer-agents", JSON.stringify(customAgents));
+  }, [customAgents]);
+
+  const registryAgents = useMemo<RegistryAgent[]>(() => {
+    if (!config) return [...previewAgents, ...customAgents];
+    return [
+      {
+        id: config.agent.id,
+        name: config.agent.name,
+        businessFunction: "Human Resources",
+        purpose: config.agent.purpose,
+        roles: config.roles.map((item) => item.name).join(", "),
+        sources: config.agent.approvedDataSources.join(", "),
+        constraints: config.tenant.constraints.join(" "),
+        outputFormat: config.agent.outputExpectations.join(", "),
+        status: "Active MVP Agent"
+      },
+      ...previewAgents,
+      ...customAgents
+    ];
+  }, [config, customAgents]);
 
   async function ask(event: FormEvent) {
     event.preventDefault();
@@ -136,6 +215,28 @@ export default function Home() {
     setSelectedAudit(payload);
   }
 
+  function createAgent(event: FormEvent) {
+    event.preventDefault();
+    if (!agentDraft.name.trim() || !agentDraft.purpose.trim()) {
+      setStatus("Agent name and purpose are required to create a configured preview.");
+      return;
+    }
+    const nextAgent: RegistryAgent = {
+      ...agentDraft,
+      id: `${agentDraft.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-${Date.now()}`,
+      name: agentDraft.name.trim(),
+      businessFunction: agentDraft.businessFunction.trim() || "General Operations",
+      roles: agentDraft.roles.trim() || "Employee, Manager",
+      sources: agentDraft.sources.trim() || "Approved internal knowledge sources",
+      constraints: agentDraft.constraints.trim() || "Escalate high-risk or unsupported requests.",
+      outputFormat: agentDraft.outputFormat.trim() || emptyAgentDraft.outputFormat,
+      status: "Configured Preview"
+    };
+    setCustomAgents((agents) => [nextAgent, ...agents]);
+    setAgentDraft(emptyAgentDraft);
+    setStatus(`${nextAgent.name} added to the Agent Registry as a configured preview.`);
+  }
+
   if (!config || !draftConfig) {
     return <main className="loading">Loading Intelligence Layer...</main>;
   }
@@ -151,6 +252,9 @@ export default function Home() {
         <nav>
           <button className={activeView === "demo" ? "active" : ""} onClick={() => setActiveView("demo")}>
             Demo
+          </button>
+          <button className={activeView === "agents" ? "active" : ""} onClick={() => setActiveView("agents")}>
+            Agents
           </button>
           <button className={activeView === "admin" ? "active" : ""} onClick={() => setActiveView("admin")}>
             Admin
@@ -169,11 +273,16 @@ export default function Home() {
       <section className="workspace">
         <header className="topbar">
           <div>
-            <p className="eyebrow">{activeView === "demo" ? "Selected Agent: HR Policy Assistant" : activeView === "admin" ? "Control Plane" : "Governance Log"}</p>
-            <h2>{activeView === "demo" ? "Turn Generic AI Into Governed Enterprise Guidance" : activeView === "admin" ? "Tenant Rulebook and Agent Controls" : "Auditable AI Interactions"}</h2>
+            <p className="eyebrow">{activeView === "demo" ? "Selected Agent: HR Policy Assistant" : activeView === "agents" ? "Agent Registry" : activeView === "admin" ? "Control Plane" : "Governance Log"}</p>
+            <h2>{activeView === "demo" ? "Turn Generic AI Into Governed Enterprise Guidance" : activeView === "agents" ? "Build Reusable Governed AI Agents" : activeView === "admin" ? "Tenant Rulebook and Agent Controls" : "Auditable AI Interactions"}</h2>
             {activeView === "demo" ? (
               <p className="topbar-copy">
                 This MVP uses HR as the first proof-of-value agent to demonstrate tenant context, role awareness, policy retrieval, and structured governance.
+              </p>
+            ) : null}
+            {activeView === "agents" ? (
+              <p className="topbar-copy">
+                The registry shows how the Intelligence Layer can support repeatable agents defined by purpose, roles, approved sources, constraints, and output expectations.
               </p>
             ) : null}
           </div>
@@ -200,6 +309,19 @@ export default function Home() {
           />
         ) : null}
 
+        {activeView === "agents" ? (
+          <AgentsView
+            agents={registryAgents}
+            draft={agentDraft}
+            setDraft={setAgentDraft}
+            createAgent={createAgent}
+            useHrAgent={() => {
+              setActiveView("demo");
+              setStatus("HR Policy Assistant is the active MVP agent for the working demo.");
+            }}
+          />
+        ) : null}
+
         {activeView === "admin" ? (
           <AdminView
             draftConfig={draftConfig}
@@ -214,6 +336,103 @@ export default function Home() {
         ) : null}
       </section>
     </main>
+  );
+}
+
+function AgentsView({
+  agents,
+  draft,
+  setDraft,
+  createAgent,
+  useHrAgent
+}: {
+  agents: RegistryAgent[];
+  draft: RegistryAgent;
+  setDraft: (draft: RegistryAgent) => void;
+  createAgent: (event: FormEvent) => void;
+  useHrAgent: () => void;
+}) {
+  return (
+    <div className="agents-layout">
+      <section className="panel agent-registry">
+        <div className="panel-heading">
+          <div>
+            <p className="eyebrow">Registry</p>
+            <h3>Configured Agents</h3>
+          </div>
+        </div>
+        <div className="agent-grid">
+          {agents.map((agent) => (
+            <article key={agent.id} className={agent.status === "Active MVP Agent" ? "agent-card active-agent" : "agent-card"}>
+              <div className="agent-card-heading">
+                <div>
+                  <span>{agent.businessFunction}</span>
+                  <h4>{agent.name}</h4>
+                </div>
+                <strong>{agent.status}</strong>
+              </div>
+              <p>{agent.purpose}</p>
+              <dl className="agent-meta">
+                <dt>Roles</dt>
+                <dd>{agent.roles}</dd>
+                <dt>Approved sources</dt>
+                <dd>{agent.sources}</dd>
+                <dt>Constraints</dt>
+                <dd>{agent.constraints}</dd>
+                <dt>Output format</dt>
+                <dd>{agent.outputFormat}</dd>
+              </dl>
+              {agent.status === "Active MVP Agent" ? (
+                <button type="button" className="primary" onClick={useHrAgent}>
+                  Use in Demo
+                </button>
+              ) : (
+                <button type="button" className="secondary" disabled>
+                  Configured Preview
+                </button>
+              )}
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <form className="panel agent-builder" onSubmit={createAgent}>
+        <div>
+          <p className="eyebrow">Builder</p>
+          <h3>Create Agent</h3>
+          <p className="muted">Create a configured preview to show how new agents would be defined in the platform.</p>
+        </div>
+        <label>
+          Agent name
+          <input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} placeholder="IT Helpdesk Assistant" />
+        </label>
+        <label>
+          Business function
+          <input value={draft.businessFunction} onChange={(event) => setDraft({ ...draft, businessFunction: event.target.value })} placeholder="IT Operations" />
+        </label>
+        <label>
+          Purpose
+          <textarea value={draft.purpose} onChange={(event) => setDraft({ ...draft, purpose: event.target.value })} rows={3} placeholder="Answer employee technology support questions using approved IT policy and escalation rules." />
+        </label>
+        <label>
+          User roles
+          <input value={draft.roles} onChange={(event) => setDraft({ ...draft, roles: event.target.value })} placeholder="Employee, IT Support, Security" />
+        </label>
+        <label>
+          Approved knowledge sources
+          <textarea value={draft.sources} onChange={(event) => setDraft({ ...draft, sources: event.target.value })} rows={3} placeholder="Device policy, access request guide, security playbook" />
+        </label>
+        <label>
+          Risk constraints
+          <textarea value={draft.constraints} onChange={(event) => setDraft({ ...draft, constraints: event.target.value })} rows={3} placeholder="Escalate account access, security incidents, and unsupported software requests." />
+        </label>
+        <label>
+          Required output format
+          <input value={draft.outputFormat} onChange={(event) => setDraft({ ...draft, outputFormat: event.target.value })} />
+        </label>
+        <button className="primary">Create Agent Preview</button>
+      </form>
+    </div>
   );
 }
 
