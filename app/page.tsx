@@ -392,7 +392,7 @@ function AgentsView({
                   Use in Demo
                 </button>
               ) : (
-                <button type="button" className="secondary compact-action" disabled>
+                <button type="button" className="preview-action" disabled>
                   Configured Preview
                 </button>
               )}

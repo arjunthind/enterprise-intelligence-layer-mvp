@@ -535,14 +535,23 @@ nav button.active {
   font-size: 13px;
 }
 
+.preview-action {
+  width: fit-content;
+  justify-self: start;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 12px 17px;
+  background: #f8fafc;
+  color: var(--accent-strong);
+  font-weight: 780;
+  box-shadow: var(--shadow-soft);
+  cursor: default;
+  opacity: 0.82;
+}
+
 .secondary:disabled {
   cursor: default;
   opacity: 0.72;
-}
-
-.compact-action {
-  width: fit-content;
-  justify-self: start;
 }
 
 .audit-layout {
