@@ -88,14 +88,14 @@ const previewAgents: RegistryAgent[] = [
   }
 ];
 
-const emptyAgentDraft: RegistryAgent = {
+const defaultAgentDraft: RegistryAgent = {
   id: "",
-  name: "",
-  businessFunction: "",
-  purpose: "",
-  roles: "",
-  sources: "",
-  constraints: "",
+  name: "IT Helpdesk Assistant",
+  businessFunction: "IT Operations",
+  purpose: "Answer employee technology support questions using approved IT policy and escalation rules.",
+  roles: "Employee, IT Support, Security",
+  sources: "Device policy, access request guide, security playbook",
+  constraints: "Escalate account access, security incidents, and unsupported software requests.",
   outputFormat: "Answer, rationale, source references, risks, next steps",
   status: "Configured Preview"
 };
@@ -115,7 +115,7 @@ export default function Home() {
   const [status, setStatus] = useState("");
   const [scenarioOpen, setScenarioOpen] = useState(false);
   const [customAgents, setCustomAgents] = useState<RegistryAgent[]>([]);
-  const [agentDraft, setAgentDraft] = useState<RegistryAgent>(emptyAgentDraft);
+  const [agentDraft, setAgentDraft] = useState<RegistryAgent>(defaultAgentDraft);
 
   const role = useMemo(() => config?.roles.find((item) => item.id === selectedRole), [config, selectedRole]);
 
@@ -161,8 +161,8 @@ export default function Home() {
         outputFormat: config.agent.outputExpectations.join(", "),
         status: "Active MVP Agent"
       },
-      ...previewAgents,
-      ...customAgents
+      ...customAgents,
+      ...previewAgents
     ];
   }, [config, customAgents]);
 
@@ -229,11 +229,15 @@ export default function Home() {
       roles: agentDraft.roles.trim() || "Employee, Manager",
       sources: agentDraft.sources.trim() || "Approved internal knowledge sources",
       constraints: agentDraft.constraints.trim() || "Escalate high-risk or unsupported requests.",
-      outputFormat: agentDraft.outputFormat.trim() || emptyAgentDraft.outputFormat,
+      outputFormat: agentDraft.outputFormat.trim() || defaultAgentDraft.outputFormat,
       status: "Configured Preview"
     };
     setCustomAgents((agents) => [nextAgent, ...agents]);
-    setAgentDraft(emptyAgentDraft);
+    setAgentDraft({
+      ...defaultAgentDraft,
+      name: "",
+      purpose: ""
+    });
     setStatus(`${nextAgent.name} added to the Agent Registry as a configured preview.`);
   }
 
@@ -392,9 +396,9 @@ function AgentsView({
                   Use in Demo
                 </button>
               ) : (
-                <button type="button" className="preview-action" disabled>
+                <span className="preview-action" aria-label="Configured preview agent">
                   Configured Preview
-                </button>
+                </span>
               )}
             </article>
           ))}
