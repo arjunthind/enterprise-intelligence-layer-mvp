@@ -2,6 +2,8 @@
 
 A Vercel-ready interactive MVP for a governed enterprise AI orchestration layer. The demo shows a fictional HR Policy Assistant for Northstar Health Systems and compares a generic AI answer with a governed, role-aware, policy-backed answer.
 
+For a polished product write-up, see [Overview of MVP for Intelligence Layer Platform](docs/intelligence-layer-mvp-overview.md).
+
 ## What It Demonstrates
 
 - Tenant rulebook injection
