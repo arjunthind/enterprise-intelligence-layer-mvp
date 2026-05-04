@@ -209,6 +209,68 @@ nav button.active {
   gap: 15px;
 }
 
+.scenario-library {
+  display: grid;
+  gap: 12px;
+  padding-bottom: 4px;
+}
+
+.scenario-library h3 {
+  margin: 5px 0 0;
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.scenario-grid button {
+  display: grid;
+  gap: 6px;
+  min-height: 112px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  background: #fbfdff;
+  color: var(--ink);
+  text-align: left;
+  transition:
+    border-color 140ms ease,
+    background 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease;
+}
+
+.scenario-grid button:hover {
+  border-color: #b7c8dc;
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+.scenario-grid button.selected {
+  border-color: #93c5fd;
+  background: var(--accent-soft);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
+}
+
+.scenario-grid strong {
+  font-size: 13px;
+  font-weight: 790;
+}
+
+.scenario-grid span {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.38;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
 .field-row,
 .comparison,
 .admin-grid,
@@ -401,6 +463,81 @@ textarea {
   background: linear-gradient(180deg, #ffffff 0%, #f8fcfb 100%);
 }
 
+.scorecard {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.scorecard h3 {
+  margin: 5px 0 0;
+  font-size: 18px;
+  font-weight: 750;
+}
+
+.scorecard-grid {
+  display: grid;
+  grid-template-columns: minmax(170px, 1.1fr) repeat(2, minmax(120px, 0.75fr));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fbfdff;
+}
+
+.scorecard-grid > div {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 12px;
+  color: #2f3a4d;
+  font-size: 14px;
+}
+
+.scorecard-grid > div:nth-child(3n) {
+  border-right: 0;
+}
+
+.scorecard-grid > div:nth-last-child(-n + 3) {
+  border-bottom: 0;
+}
+
+.scorecard-head {
+  background: #f1f5f9;
+  color: var(--muted) !important;
+  font-size: 12px !important;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.governed-head {
+  background: var(--teal-soft);
+  color: var(--teal) !important;
+}
+
+.score-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.muted-pill {
+  background: #eef2f7;
+  color: var(--muted);
+}
+
+.good-pill {
+  background: var(--teal-soft);
+  color: var(--teal);
+}
+
 .answer {
   margin: 0;
   color: #293447;
@@ -551,7 +688,8 @@ dd {
   .comparison,
   .admin-grid,
   .audit-layout,
-  .trace-grid {
+  .trace-grid,
+  .scenario-grid {
     grid-template-columns: 1fr;
   }
 
@@ -588,6 +726,21 @@ dd {
 
   .mode-row {
     width: 100%;
+  }
+
+  .scorecard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .scorecard-grid > div,
+  .scorecard-grid > div:nth-child(3n),
+  .scorecard-grid > div:nth-last-child(-n + 3) {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .scorecard-grid > div:last-child {
+    border-bottom: 0;
   }
 
   .mode-control {

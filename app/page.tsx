@@ -5,6 +5,42 @@ import type { AuditEvent, ConfigPayload, GovernedResponse, ResponseMode, Trace }
 
 const defaultQuery = "Can I work remotely from another state for 3 months?";
 
+const scenarios = [
+  {
+    title: "Employee mobility",
+    roleId: "employee",
+    query: "Can I work remotely from another state for 3 months?"
+  },
+  {
+    title: "Manager approval",
+    roleId: "manager",
+    query: "My employee wants to work from California for 45 days. Can I approve it?"
+  },
+  {
+    title: "Data security",
+    roleId: "compliance",
+    query: "What are the risks if I access patient data while working remotely from another state?"
+  },
+  {
+    title: "HR process",
+    roleId: "hr-admin",
+    query: "What documentation should HR collect before approving temporary out-of-state remote work?"
+  },
+  {
+    title: "Insufficient context",
+    roleId: "employee",
+    query: "Can I move wherever I want and keep my current job?"
+  }
+];
+
+const scorecardRows = [
+  ["Uses company policy", "No", "Yes"],
+  ["Role-aware guidance", "No", "Yes"],
+  ["Source-backed answer", "No", "Yes"],
+  ["Risk escalation", "Unclear", "Required"],
+  ["Structured output", "No", "Yes"]
+];
+
 type AskResult = {
   genericResponse: string;
   governedResponse: GovernedResponse;
@@ -201,6 +237,28 @@ function DemoView({
   return (
     <div className="stack">
       <form className="query-panel" onSubmit={ask}>
+        <section className="scenario-library" aria-label="Scenario library">
+          <div>
+            <p className="eyebrow">Scenario Library</p>
+            <h3>Pick a boardroom-ready test case</h3>
+          </div>
+          <div className="scenario-grid">
+            {scenarios.map((scenario) => (
+              <button
+                key={scenario.title}
+                type="button"
+                className={query === scenario.query && roleId === scenario.roleId ? "selected" : ""}
+                onClick={() => {
+                  setRoleId(scenario.roleId);
+                  setQuery(scenario.query);
+                }}
+              >
+                <strong>{scenario.title}</strong>
+                <span>{scenario.query}</span>
+              </button>
+            ))}
+          </div>
+        </section>
         <div className="field-row">
           <label>
             Organization
@@ -264,6 +322,8 @@ function DemoView({
         </section>
       </div>
 
+      {result ? <EvaluationScorecard /> : null}
+
       <section className="trace">
         <div className="panel-heading">
           <p className="eyebrow">Runtime Decision Layer</p>
@@ -283,6 +343,41 @@ function DemoView({
         )}
       </section>
     </div>
+  );
+}
+
+function EvaluationScorecard() {
+  return (
+    <section className="scorecard">
+      <div className="panel-heading">
+        <div>
+          <p className="eyebrow">Proof of Value</p>
+          <h3>Response Quality Scorecard</h3>
+        </div>
+      </div>
+      <div className="scorecard-grid">
+        <div className="scorecard-head">Dimension</div>
+        <div className="scorecard-head">Generic AI</div>
+        <div className="scorecard-head governed-head">Governed AI</div>
+        {scorecardRows.map(([dimension, generic, governed]) => (
+          <FragmentRow key={dimension} dimension={dimension} generic={generic} governed={governed} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function FragmentRow({ dimension, generic, governed }: { dimension: string; generic: string; governed: string }) {
+  return (
+    <>
+      <div>{dimension}</div>
+      <div>
+        <span className="score-pill muted-pill">{generic}</span>
+      </div>
+      <div>
+        <span className="score-pill good-pill">{governed}</span>
+      </div>
+    </>
   );
 }
 
