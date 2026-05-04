@@ -277,7 +277,7 @@ export default function Home() {
       <section className="workspace">
         <header className="topbar">
           <div>
-            <p className="eyebrow">{activeView === "demo" ? "Selected Agent: HR Policy Assistant" : activeView === "agents" ? "Use-Case Layer" : activeView === "admin" ? "Governance Controls" : "Governance Log"}</p>
+            <p className="eyebrow">{activeView === "demo" ? "Demo Agent: HR Policy Assistant" : activeView === "agents" ? "Use-Case Layer" : activeView === "admin" ? "Governance Controls" : "Governance Log"}</p>
             <h2>{activeView === "demo" ? "Turn Generic AI Into Governed Enterprise Guidance" : activeView === "agents" ? "Agent Registry and Builder" : activeView === "admin" ? "Tenant Controls for the Active HR Demo" : "Auditable AI Interactions"}</h2>
             {activeView === "demo" ? (
               <p className="topbar-copy">
@@ -504,7 +504,7 @@ function DemoView({
         <div className="mode-control">
           <div className="mode-row" aria-label="Response mode">
             <button type="button" className={mode === "demo" ? "selected" : ""} onClick={() => setMode("demo")}>
-              Demo mode
+              Demo Mode
             </button>
             <button type="button" className={mode === "live" ? "selected" : ""} onClick={() => setMode("live")}>
               Live AI
@@ -513,8 +513,8 @@ function DemoView({
           <div className="info-bubble" tabIndex={0} aria-label="Mode information">
             i
             <div className="info-popover" role="tooltip">
-              <strong>Demo mode</strong> uses deterministic policy-backed responses for reliable stakeholder review.
-              <strong>Live AI</strong> calls OpenAI when API access and billing are configured.
+              <strong>Demo Mode:</strong> Uses deterministic policy-backed responses for reliable stakeholder review.
+              <strong>Live AI:</strong> Calls OpenAI when API access and billing are configured.
             </div>
           </div>
         </div>
