@@ -116,16 +116,6 @@ nav button.active {
   background: rgba(255, 255, 255, 0.05);
 }
 
-.passcode {
-  color: #b8c8c1;
-}
-
-.passcode input {
-  border-color: rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.08);
-  color: #f7fbf8;
-}
-
 .tenant-card span,
 .tenant-card small {
   color: #b8c8c1;

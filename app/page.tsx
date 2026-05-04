@@ -20,7 +20,6 @@ export default function Home() {
   const [draftConfig, setDraftConfig] = useState<ConfigPayload | null>(null);
   const [selectedRole, setSelectedRole] = useState("employee");
   const [query, setQuery] = useState(defaultQuery);
-  const [passcode, setPasscode] = useState("");
   const [mode, setMode] = useState<"demo" | "auto" | "live">("demo");
   const [activeView, setActiveView] = useState<"demo" | "admin" | "audit">("demo");
   const [result, setResult] = useState<AskResult | null>(null);
@@ -39,12 +38,12 @@ export default function Home() {
     setDraftConfig(structuredClone(payload));
   }
 
-  const loadAudits = useCallback(async (code = passcode) => {
-    const response = await fetch("/api/audit", { headers: { "x-demo-passcode": code } });
+  const loadAudits = useCallback(async () => {
+    const response = await fetch("/api/audit");
     if (!response.ok) return;
     const payload = (await response.json()) as { events: AuditEvent[] };
     setAudits(payload.events);
-  }, [passcode]);
+  }, []);
 
   useEffect(() => {
     void loadConfig();
@@ -53,17 +52,13 @@ export default function Home() {
 
   async function ask(event: FormEvent) {
     event.preventDefault();
-    if (mode !== "demo" && !passcode) {
-      setStatus("Enter the demo passcode to use Auto fallback or Live AI. Demo mode runs without a passcode.");
-      return;
-    }
     setLoading(true);
     setStatus("Assembling tenant rules, role guidance, policy context, and schema...");
     setResult(null);
 
     const response = await fetch("/api/ask", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-demo-passcode": passcode },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query, roleId: selectedRole, compareMode: true, mode })
     });
     const payload = (await response.json()) as AskResult;
@@ -74,7 +69,7 @@ export default function Home() {
         : "Live AI request failed; auditable fallback captured."
     );
     setLoading(false);
-    if (passcode) await loadAudits(passcode);
+    await loadAudits();
   }
 
   async function saveConfig() {
@@ -82,14 +77,11 @@ export default function Home() {
     setSaving(true);
     const response = await fetch("/api/config", {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "x-demo-passcode": passcode
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(draftConfig)
     });
     if (!response.ok) {
-      setStatus("Config save failed. Check the demo passcode.");
+      setStatus("Config save failed. Review the entered rulebook values and try again.");
       setSaving(false);
       return;
     }
@@ -101,7 +93,7 @@ export default function Home() {
   }
 
   async function openAudit(id: string) {
-    const response = await fetch(`/api/audit/${id}`, { headers: { "x-demo-passcode": passcode } });
+    const response = await fetch(`/api/audit/${id}`);
     if (!response.ok) return;
     const payload = (await response.json()) as AuditEvent;
     setSelectedAudit(payload);
@@ -130,15 +122,6 @@ export default function Home() {
             Audit
           </button>
         </nav>
-        <label className="passcode">
-          Passcode for Admin, Audit, and Live AI
-          <input
-            type="password"
-            value={passcode}
-            onChange={(event) => setPasscode(event.target.value)}
-            placeholder="Optional for Demo mode"
-          />
-        </label>
         <div className="tenant-card">
           <span>Tenant</span>
           <strong>{config.tenant.tenantName}</strong>
@@ -177,8 +160,6 @@ export default function Home() {
           <AdminView
             draftConfig={draftConfig}
             setDraftConfig={setDraftConfig}
-            passcode={passcode}
-            setPasscode={setPasscode}
             saveConfig={saveConfig}
             saving={saving}
           />
@@ -250,7 +231,7 @@ function DemoView({
           </button>
         </div>
         <p className="mode-note">
-          Demo mode is open for quick review. Passcode is only needed for Admin, Audit, Auto fallback, or Live AI.
+          Demo mode is deterministic for reliable stakeholder review. Auto fallback and Live AI use the same runtime path when API access is configured.
         </p>
         <label>
           User request
@@ -336,15 +317,11 @@ function TraceItem({ label, value }: { label: string; value: string }) {
 function AdminView({
   draftConfig,
   setDraftConfig,
-  passcode,
-  setPasscode,
   saveConfig,
   saving
 }: {
   draftConfig: ConfigPayload;
   setDraftConfig: (config: ConfigPayload) => void;
-  passcode: string;
-  setPasscode: (value: string) => void;
   saveConfig: () => Promise<void>;
   saving: boolean;
 }) {
@@ -429,10 +406,6 @@ function AdminView({
             onChange={(event) => setDraftConfig({ ...draftConfig, agent: { ...draftConfig.agent, purpose: event.target.value } })}
             rows={4}
           />
-        </label>
-        <label>
-          Demo passcode
-          <input type="password" value={passcode} onChange={(event) => setPasscode(event.target.value)} placeholder="Required when DEMO_PASSCODE is set" />
         </label>
         <button className="primary" onClick={saveConfig} disabled={saving}>
           {saving ? "Saving..." : "Save Configuration"}

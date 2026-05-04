@@ -10,7 +10,6 @@ A Vercel-ready interactive MVP for a governed enterprise AI orchestration layer.
 - OpenAI Responses API calls with Structured Outputs
 - Admin-editable rule, role, policy, and agent settings
 - Auditable interaction history
-- Private demo passcode gating
 - Hybrid execution: deterministic demo mode, live OpenAI mode, or automatic fallback
 
 ## Environment
@@ -21,12 +20,11 @@ Create `.env.local` for local development or set these in Vercel:
 OPENAI_API_KEY=
 OPENAI_MODEL=gpt-5.2
 DATABASE_URL=
-DEMO_PASSCODE=demo-intel-layer
 ```
 
 `DATABASE_URL` should point to a Postgres database such as Vercel Postgres, Neon, or Supabase. If `DATABASE_URL` is omitted, the app uses in-memory demo storage for local UI review only.
 
-The app defaults to Demo mode in the UI so stakeholder walkthroughs remain reliable without API credits or a passcode. The passcode protects Admin, Audit, Auto fallback, and Live AI. Auto fallback attempts live OpenAI first and then uses deterministic demo output if quota, billing, or network access fails. Live AI forces a real API call.
+The app defaults to Demo mode in the UI so stakeholder walkthroughs remain reliable without API credits. Auto fallback attempts live OpenAI first and then uses deterministic demo output if quota, billing, or network access fails. Live AI forces a real API call. In production, Admin, Audit, and model execution would be protected by enterprise SSO and role-based access control; this MVP keeps access open to reduce reviewer friction.
 
 ## Run Locally
 
@@ -35,13 +33,13 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`, enter the `DEMO_PASSCODE`, and run the default remote-work query.
+Open `http://localhost:3000` and run the default remote-work query in Demo mode.
 
 ## Deploy To Vercel
 
 1. Push this project to a Git repository.
 2. Import it into Vercel.
-3. Add `OPENAI_API_KEY`, `OPENAI_MODEL`, `DATABASE_URL`, and `DEMO_PASSCODE`.
+3. Optionally add `OPENAI_API_KEY`, `OPENAI_MODEL`, and `DATABASE_URL`.
 4. Deploy.
 
 The app creates its Postgres tables automatically on first read/write:
