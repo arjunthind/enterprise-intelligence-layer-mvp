@@ -638,6 +638,12 @@ textarea {
   margin-bottom: 13px;
 }
 
+.trace-heading {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
 .panel h3,
 .trace h3 {
   margin: 0 0 14px;
@@ -646,6 +652,10 @@ textarea {
 }
 
 .panel-heading h3 {
+  margin: 0;
+}
+
+.trace-heading h3 {
   margin: 0;
 }
 

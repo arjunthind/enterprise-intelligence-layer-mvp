@@ -582,7 +582,7 @@ function DemoView({
       {result ? <EvaluationScorecard /> : null}
 
       <section className="trace">
-        <div className="panel-heading">
+        <div className="trace-heading">
           <p className="eyebrow">Runtime Decision Layer</p>
           <h3>Intelligence Layer Trace</h3>
         </div>
