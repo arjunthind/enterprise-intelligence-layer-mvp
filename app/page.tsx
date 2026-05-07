@@ -100,6 +100,22 @@ const defaultAgentDraft: RegistryAgent = {
   status: "Configured Preview"
 };
 
+function agentRegistryKey(agent: RegistryAgent) {
+  return [agent.name, agent.businessFunction, agent.purpose]
+    .map((value) => value.trim().toLowerCase().replace(/\s+/g, " "))
+    .join("|");
+}
+
+function dedupeAgents(agents: RegistryAgent[]) {
+  const seen = new Set<string>();
+  return agents.filter((agent) => {
+    const key = agentRegistryKey(agent);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 export default function Home() {
   const [config, setConfig] = useState<ConfigPayload | null>(null);
   const [draftConfig, setDraftConfig] = useState<ConfigPayload | null>(null);
@@ -140,7 +156,13 @@ export default function Home() {
 
   useEffect(() => {
     const savedAgents = window.localStorage.getItem("intelligence-layer-agents");
-    if (savedAgents) setCustomAgents(JSON.parse(savedAgents) as RegistryAgent[]);
+    if (!savedAgents) return;
+    try {
+      setCustomAgents(dedupeAgents(JSON.parse(savedAgents) as RegistryAgent[]));
+    } catch {
+      window.localStorage.removeItem("intelligence-layer-agents");
+      setCustomAgents([]);
+    }
   }, []);
 
   useEffect(() => {
@@ -149,7 +171,7 @@ export default function Home() {
 
   const registryAgents = useMemo<RegistryAgent[]>(() => {
     if (!config) return [...previewAgents, ...customAgents];
-    return [
+    return dedupeAgents([
       {
         id: config.agent.id,
         name: config.agent.name,
@@ -163,7 +185,7 @@ export default function Home() {
       },
       ...customAgents,
       ...previewAgents
-    ];
+    ]);
   }, [config, customAgents]);
 
   async function ask(event: FormEvent) {
@@ -232,7 +254,12 @@ export default function Home() {
       outputFormat: agentDraft.outputFormat.trim() || defaultAgentDraft.outputFormat,
       status: "Configured Preview"
     };
-    setCustomAgents((agents) => [nextAgent, ...agents]);
+    const duplicateExists = registryAgents.some((agent) => agentRegistryKey(agent) === agentRegistryKey(nextAgent));
+    if (duplicateExists) {
+      setStatus(`${nextAgent.name} is already in the Agent Registry, so no duplicate was created.`);
+      return;
+    }
+    setCustomAgents((agents) => dedupeAgents([nextAgent, ...agents]));
     setAgentDraft({
       ...defaultAgentDraft,
       name: "",

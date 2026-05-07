@@ -189,7 +189,7 @@ function buildDemoGovernedResponse(config: ConfigPayload, role: RoleConfig, poli
   if (normalizedQuery.includes("move wherever") || normalizedQuery.includes("keep my current job")) {
     return {
       answer:
-        "No. The employee should not assume they can move anywhere and keep the same job without prior approval. Northstar permits routine remote flexibility only from an approved home state, and location changes can require HR, payroll, tax, workers compensation, licensing, manager, and security review.",
+        "No. The employee should not assume they can move anywhere and keep the same job without prior approval. The request does not name a specific state, date range, or work arrangement, and Northstar location changes can require HR, payroll, tax, workers compensation, licensing, manager, and security review.",
       supportingRationale: `${config.tenant.tenantName}'s policy does not provide blanket approval for unrestricted relocation. Because the question lacks a specific state, dates, role impact, and data-access details, the governed response must be cautious and escalation-oriented.`,
       sourceReferences: refs,
       risksOrLimitations: [
