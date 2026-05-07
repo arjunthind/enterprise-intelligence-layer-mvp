@@ -104,7 +104,7 @@ function buildDemoComparison(
 ) {
   return {
     genericResponse: buildDemoGenericResponse(query),
-    governedResponse: buildDemoGovernedResponse(config, role, policies),
+    governedResponse: buildDemoGovernedResponse(config, role, policies, query),
     trace,
     policyRefs: policies.map((policy) => policy.sourceLabel),
     rawStatus: mode === "Demo fallback" ? "demo_fallback" : "demo",
@@ -140,8 +140,73 @@ function buildDemoGenericResponse(query: string) {
   return "This depends on your company policy and your specific situation. Check with the relevant internal team before acting.";
 }
 
-function buildDemoGovernedResponse(config: ConfigPayload, role: RoleConfig, policies: PolicyDocument[]): GovernedResponse {
+function buildDemoGovernedResponse(config: ConfigPayload, role: RoleConfig, policies: PolicyDocument[], query: string): GovernedResponse {
   const refs = policies.map((policy) => `${policy.sourceLabel}: ${policy.title}`);
+  const normalizedQuery = query.toLowerCase();
+
+  if (normalizedQuery.includes("patient data") || normalizedQuery.includes("patient information")) {
+    return {
+      answer:
+        "Accessing patient data while working remotely from another state should be treated as a high-risk request. Northstar policy requires company-managed devices, approved VPN, multifactor authentication, private networks, and Security review before accessing patient information from an unapproved location.",
+      supportingRationale: `${config.tenant.tenantName}'s Data Security Addendum applies because the request involves patient data and remote access from another state. The Intelligence Layer prioritizes security and compliance constraints over general remote-work flexibility.`,
+      sourceReferences: refs,
+      risksOrLimitations: [
+        "Patient information may trigger privacy, security, and regulated-data handling obligations.",
+        "Access from an unapproved state, public network, or personal device may violate policy.",
+        "This MVP uses fictional Northstar policy data for demonstration and is not legal, security, or compliance advice."
+      ],
+      recommendedNextSteps: [
+        "Confirm the work location, device type, network, VPN, and multifactor authentication setup.",
+        "Route the request to Security or Compliance before patient data is accessed.",
+        "Document approval status and any access restrictions in the HR or security intake record."
+      ],
+      confidence: "High",
+      escalationRequired: true
+    };
+  }
+
+  if (normalizedQuery.includes("documentation") || normalizedQuery.includes("what should hr collect")) {
+    return {
+      answer:
+        "HR should collect the destination state, exact remote-work dates, job duties, manager acknowledgement, whether patient or regulated data will be accessed, and any payroll, tax, workers compensation, licensing, or security considerations before approval.",
+      supportingRationale: `${config.tenant.tenantName}'s Remote Work Policy requires HR review for temporary out-of-state work beyond 30 calendar days. The Employee Mobility Checklist defines the minimum intake details needed before approval.`,
+      sourceReferences: refs,
+      risksOrLimitations: [
+        "Incomplete intake can lead to unsupported payroll, tax, workers compensation, or security exposure.",
+        "Manager acknowledgement is not the same as final HR approval.",
+        "Some requests may require Payroll, Legal, Security, or Compliance review before a decision."
+      ],
+      recommendedNextSteps: [
+        "Use a standardized HR intake checklist before routing the request.",
+        "Document manager acknowledgement and business need.",
+        "Escalate requests involving patient data, unapproved locations, or stays beyond 30 calendar days."
+      ],
+      confidence: "High",
+      escalationRequired: true
+    };
+  }
+
+  if (normalizedQuery.includes("move wherever") || normalizedQuery.includes("keep my current job")) {
+    return {
+      answer:
+        "No. The employee should not assume they can move anywhere and keep the same job without prior approval. Northstar permits routine remote flexibility only from an approved home state, and location changes can require HR, payroll, tax, workers compensation, licensing, manager, and security review.",
+      supportingRationale: `${config.tenant.tenantName}'s policy does not provide blanket approval for unrestricted relocation. Because the question lacks a specific state, dates, role impact, and data-access details, the governed response must be cautious and escalation-oriented.`,
+      sourceReferences: refs,
+      risksOrLimitations: [
+        "The request lacks key details needed to determine eligibility.",
+        "Permanent relocation may create different obligations than temporary remote work.",
+        "Approval may depend on role duties, business needs, payroll setup, licensing, and data security controls."
+      ],
+      recommendedNextSteps: [
+        "Ask the employee to provide the proposed location, timing, reason for relocation, and expected duration.",
+        "Route the request through HR before the employee changes work location.",
+        "Confirm payroll, tax, workers compensation, licensing, manager approval, and security implications before giving a final answer."
+      ],
+      confidence: "High",
+      escalationRequired: true
+    };
+  }
+
   const roleSpecific = {
     Employee:
       "You should not assume approval for a three-month out-of-state remote arrangement. Northstar allows routine remote flexibility from an approved home state, but out-of-state remote work beyond 30 calendar days requires HR review before approval.",
