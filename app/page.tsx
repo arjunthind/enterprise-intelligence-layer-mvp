@@ -305,7 +305,7 @@ export default function Home() {
       <section className="workspace">
         <header className="topbar">
           <div>
-            <p className="topbar-kicker">{activeView === "demo" ? "Routing layer preview" : activeView === "agents" ? "Use-case layer" : activeView === "admin" ? "Governance controls" : "Governance log"}</p>
+            <p className="eyebrow">{activeView === "demo" ? "Runtime Routing Demo" : activeView === "agents" ? "Use-Case Layer" : activeView === "admin" ? "Governance Controls" : "Governance Log"}</p>
             <h2>{activeView === "demo" ? "Turn Generic AI Into Governed Enterprise Guidance" : activeView === "agents" ? "Agent Registry and Builder" : activeView === "admin" ? "Tenant Controls for the Active HR Demo" : "Auditable AI Interactions"}</h2>
             {activeView === "demo" ? (
               <p className="topbar-copy">
