@@ -63,6 +63,11 @@ main {
 }
 
 .sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 292px;
+  min-height: 100vh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -152,6 +157,7 @@ nav button.active {
 }
 
 .workspace {
+  grid-column: 2;
   min-width: 0;
   padding: 34px;
 }
@@ -897,10 +903,14 @@ dd {
   }
 
   .sidebar {
+    position: static;
+    width: auto;
     min-height: auto;
+    overflow: visible;
   }
 
   .workspace {
+    grid-column: auto;
     padding: 22px;
   }
 
