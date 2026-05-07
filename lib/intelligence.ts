@@ -115,9 +115,28 @@ function buildDemoComparison(
 }
 
 function buildDemoGenericResponse(query: string) {
-  if (query.toLowerCase().includes("remote")) {
+  const normalizedQuery = query.toLowerCase();
+
+  if (normalizedQuery.includes("patient data") || normalizedQuery.includes("patient information")) {
+    return "Accessing patient data while working remotely can create privacy and security risks, especially if you are using an unsecured network, personal device, or unapproved location. You should follow your company's security policies and check with IT, Security, or Compliance before accessing sensitive information.";
+  }
+
+  if (normalizedQuery.includes("my employee") || normalizedQuery.includes("can i approve")) {
+    return "You may be able to approve remote work depending on company policy, the employee's role, team coverage, and any state-specific requirements. It is usually best to confirm with HR before approving an extended out-of-state arrangement.";
+  }
+
+  if (normalizedQuery.includes("documentation") || normalizedQuery.includes("what should hr collect")) {
+    return "HR should generally collect the employee's requested work location, dates, manager approval, job duties, and any details that could affect payroll, taxes, benefits, or compliance. The exact documentation depends on company policy.";
+  }
+
+  if (normalizedQuery.includes("move wherever") || normalizedQuery.includes("keep my current job")) {
+    return "You should not assume you can move anywhere and keep the same job without approval. Remote work eligibility often depends on company policy, your role, business needs, payroll setup, and legal or tax considerations.";
+  }
+
+  if (normalizedQuery.includes("remote") || normalizedQuery.includes("another state")) {
     return "It may be possible to work remotely from another state for three months, but you should check with your manager and HR. Requirements can vary based on company policy, taxes, payroll, and job responsibilities.";
   }
+
   return "This depends on your company policy and your specific situation. Check with the relevant internal team before acting.";
 }
 
