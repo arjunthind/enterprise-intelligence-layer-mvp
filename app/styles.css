@@ -1,22 +1,26 @@
 :root {
-  --ink: #18212f;
-  --muted: #687384;
-  --soft: #8a95a6;
-  --line: #dfe5ec;
+  --ink: #152033;
+  --muted: #667388;
+  --soft: #8d98a9;
+  --line: #e2e8f0;
   --panel: #ffffff;
-  --surface: #f6f8fb;
-  --sidebar: #111827;
-  --sidebar-soft: #c8d2df;
-  --accent: #2563eb;
-  --accent-strong: #1d4ed8;
-  --accent-soft: #e8f0ff;
-  --teal: #0f766e;
-  --teal-soft: #e6f5f3;
-  --amber: #b7791f;
-  --warning-bg: #fff7e8;
-  --warning-text: #855b16;
-  --shadow: 0 18px 45px rgba(24, 33, 47, 0.08);
-  --shadow-soft: 0 8px 28px rgba(24, 33, 47, 0.06);
+  --surface: #f5f7fb;
+  --surface-warm: #fbfaf7;
+  --sidebar: #101827;
+  --sidebar-deep: #0c1320;
+  --sidebar-soft: #b9c7d8;
+  --sidebar-muted: #8392a7;
+  --accent: #2f6fed;
+  --accent-strong: #2457cf;
+  --accent-soft: #edf4ff;
+  --teal: #11766e;
+  --teal-soft: #e7f5f2;
+  --amber: #a66a16;
+  --warning-bg: #fff7e7;
+  --warning-text: #815514;
+  --shadow: 0 18px 44px rgba(17, 27, 44, 0.075);
+  --shadow-soft: 0 10px 26px rgba(17, 27, 44, 0.055);
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
 * {
@@ -29,7 +33,8 @@ body {
   min-height: 100%;
   color: var(--ink);
   background:
-    radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 28rem),
+    linear-gradient(180deg, rgba(237, 244, 255, 0.72), rgba(245, 247, 251, 0) 360px),
+    radial-gradient(circle at top left, rgba(47, 111, 237, 0.075), transparent 30rem),
     var(--surface);
   font-family:
     ui-sans-serif, Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display",
@@ -70,27 +75,28 @@ main {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  padding: 30px 26px;
+  gap: 30px;
+  padding: 32px 24px;
   background:
-    linear-gradient(180deg, rgba(37, 99, 235, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(47, 111, 237, 0.18), rgba(17, 118, 110, 0.07) 43%, transparent 72%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.045), transparent 28%),
     var(--sidebar);
   color: #f8fbff;
 }
 
 .sidebar h1 {
-  margin: 10px 0 12px;
-  font-size: 32px;
-  font-weight: 760;
-  line-height: 1.04;
+  margin: 12px 0 13px;
+  font-size: 31px;
+  font-weight: 730;
+  line-height: 1.08;
   letter-spacing: 0;
 }
 
 .sidebar-copy {
   margin: 0;
   color: var(--sidebar-soft);
-  font-size: 15px;
-  line-height: 1.58;
+  font-size: 14px;
+  line-height: 1.62;
 }
 
 .eyebrow {
@@ -103,57 +109,65 @@ main {
 }
 
 .sidebar .eyebrow {
-  color: #93c5fd;
+  color: #9fc4ff;
 }
 
 nav {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 nav button {
   width: 100%;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  border-radius: 10px;
-  padding: 13px 15px;
-  color: #eaf1fb;
-  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(185, 199, 216, 0.16);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #e7eef8;
+  background: rgba(255, 255, 255, 0.035);
   text-align: left;
-  font-weight: 720;
+  font-weight: 650;
+  letter-spacing: 0;
   transition:
     background 140ms ease,
     border-color 140ms ease,
-    transform 140ms ease;
+    transform 140ms ease,
+    color 140ms ease;
 }
 
 nav button:hover {
-  border-color: rgba(147, 197, 253, 0.46);
-  background: rgba(255, 255, 255, 0.085);
+  border-color: rgba(159, 196, 255, 0.36);
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
 }
 
 nav button.active {
-  border-color: rgba(147, 197, 253, 0.82);
-  background: rgba(37, 99, 235, 0.28);
-  box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.28);
+  border-color: rgba(159, 196, 255, 0.54);
+  background: linear-gradient(180deg, rgba(47, 111, 237, 0.32), rgba(47, 111, 237, 0.22));
+  color: #ffffff;
+  box-shadow:
+    inset 3px 0 0 rgba(99, 179, 237, 0.82),
+    0 10px 26px rgba(5, 12, 24, 0.2);
 }
 
 .tenant-card {
   display: grid;
   gap: 8px;
   margin-top: auto;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
+  border: 1px solid rgba(185, 199, 216, 0.18);
+  border-radius: 14px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.055);
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
 }
 
 .tenant-card span,
 .tenant-card small {
-  color: var(--sidebar-soft);
+  color: var(--sidebar-muted);
 }
 
 .tenant-card strong {
-  font-weight: 760;
+  color: #f8fbff;
+  font-weight: 690;
 }
 
 .workspace {
@@ -174,8 +188,8 @@ nav button.active {
   margin: 7px 0 0;
   max-width: 780px;
   font-size: 34px;
-  font-weight: 760;
-  line-height: 1.08;
+  font-weight: 720;
+  line-height: 1.1;
   letter-spacing: 0;
 }
 
@@ -192,7 +206,7 @@ nav button.active {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.9);
   color: var(--muted);
   box-shadow: var(--shadow-soft);
   white-space: nowrap;
@@ -214,9 +228,9 @@ nav button.active {
 .panel,
 .trace {
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.92);
   box-shadow: var(--shadow);
 }
 
@@ -241,9 +255,9 @@ nav button.active {
 .secondary,
 .icon-button {
   border: 1px solid var(--line);
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.96);
   color: var(--accent-strong);
-  font-weight: 780;
+  font-weight: 720;
   box-shadow: var(--shadow-soft);
 }
 
@@ -276,10 +290,10 @@ nav button.active {
   width: min(980px, 100%);
   gap: 18px;
   border: 1px solid rgba(255, 255, 255, 0.46);
-  border-radius: 18px;
+  border-radius: 20px;
   padding: 22px;
   background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.28);
+  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.24);
 }
 
 .modal-heading {
@@ -306,9 +320,9 @@ nav button.active {
   gap: 6px;
   min-height: 126px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 12px;
-  background: #fbfdff;
+  background: #fcfdff;
   color: var(--ink);
   text-align: left;
   transition:
@@ -325,9 +339,9 @@ nav button.active {
 }
 
 .scenario-grid button.selected {
-  border-color: #93c5fd;
+  border-color: #a7c5ff;
   background: var(--accent-soft);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 8px 20px rgba(47, 111, 237, 0.12);
 }
 
 .scenario-grid strong {
@@ -383,7 +397,7 @@ nav button.active {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 3px;
-  background: #eef3f8;
+  background: #edf2f8;
 }
 
 .mode-row button {
@@ -393,7 +407,7 @@ nav button.active {
   background: transparent;
   color: var(--muted);
   font-size: 13px;
-  font-weight: 780;
+  font-weight: 720;
 }
 
 .mode-row button.selected {
@@ -410,7 +424,7 @@ nav button.active {
   place-items: center;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.96);
   color: var(--accent-strong);
   font-size: 14px;
   font-weight: 800;
@@ -487,13 +501,13 @@ nav button.active {
   align-items: start;
   gap: 13px;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 15px;
   padding: 16px;
-  background: #fbfdff;
+  background: #fcfdff;
 }
 
 .agent-card.active-agent {
-  border-color: #bfe5df;
+  border-color: #b7dfd8;
   background: linear-gradient(180deg, #ffffff 0%, #f8fcfb 100%);
 }
 
@@ -515,7 +529,7 @@ nav button.active {
 .agent-card-heading h4 {
   margin: 5px 0 0;
   font-size: 17px;
-  font-weight: 760;
+  font-weight: 710;
 }
 
 .agent-card-heading strong {
@@ -561,9 +575,9 @@ nav button.active {
   min-height: 0;
   justify-self: start;
   border: 1px solid var(--line);
-  border-radius: 11px;
+  border-radius: 12px;
   padding: 12px 17px;
-  background: #f8fafc;
+  background: #fbfcff;
   color: var(--accent-strong);
   font-size: 13px;
   font-weight: 780;
@@ -596,9 +610,9 @@ select,
 textarea {
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 11px;
+  border-radius: 12px;
   padding: 11px 12px;
-  background: #fbfdff;
+  background: #fcfdff;
   color: var(--ink);
   font-weight: 500;
   outline: none;
@@ -611,9 +625,9 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #93c5fd;
+  border-color: #a7c5ff;
   background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 0 0 4px rgba(47, 111, 237, 0.12);
 }
 
 textarea {
@@ -625,12 +639,12 @@ textarea {
 .primary {
   width: fit-content;
   border: 0;
-  border-radius: 11px;
+  border-radius: 12px;
   padding: 12px 17px;
-  background: linear-gradient(180deg, #2f74f3 0%, var(--accent) 100%);
+  background: linear-gradient(180deg, #3a7af1 0%, var(--accent) 100%);
   color: #fff;
-  font-weight: 780;
-  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.24);
+  font-weight: 740;
+  box-shadow: 0 10px 22px rgba(47, 111, 237, 0.23);
   transition:
     transform 140ms ease,
     box-shadow 140ms ease;
@@ -638,7 +652,7 @@ textarea {
 
 .primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.26);
+  box-shadow: 0 14px 28px rgba(47, 111, 237, 0.25);
 }
 
 .primary:disabled {
@@ -665,7 +679,7 @@ textarea {
 .trace h3 {
   margin: 0 0 14px;
   font-size: 18px;
-  font-weight: 750;
+  font-weight: 710;
 }
 
 .panel-heading h3 {
@@ -683,7 +697,7 @@ textarea {
 }
 
 .governed {
-  border-color: #bfe5df;
+  border-color: #b7dfd8;
   background: linear-gradient(180deg, #ffffff 0%, #f8fcfb 100%);
 }
 
@@ -691,18 +705,18 @@ textarea {
   width: fit-content;
   max-width: 100%;
   margin: -2px 0 12px;
-  border: 1px solid #d7e3f5;
+  border: 1px solid #d9e4f3;
   border-radius: 999px;
   padding: 7px 11px;
-  background: #f6f9ff;
+  background: #f7faff;
   color: #526175;
   font-size: 13px;
-  font-weight: 750;
+  font-weight: 700;
 }
 
 .scorecard {
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 20px;
   background: rgba(255, 255, 255, 0.92);
   box-shadow: var(--shadow);
@@ -711,7 +725,7 @@ textarea {
 .scorecard h3 {
   margin: 5px 0 0;
   font-size: 18px;
-  font-weight: 750;
+  font-weight: 710;
 }
 
 .scorecard-grid {
@@ -720,7 +734,7 @@ textarea {
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fbfdff;
+  background: #fcfdff;
 }
 
 .scorecard-grid > div {
@@ -743,7 +757,7 @@ textarea {
 }
 
 .scorecard-head {
-  background: #f1f5f9;
+  background: #f4f7fb;
   color: var(--muted) !important;
   font-size: 12px !important;
   font-weight: 800;
@@ -766,7 +780,7 @@ textarea {
 }
 
 .muted-pill {
-  background: #eef2f7;
+  background: #eef3f8;
   color: var(--muted);
 }
 
@@ -778,7 +792,7 @@ textarea {
 .answer {
   margin: 0;
   color: #293447;
-  line-height: 1.62;
+  line-height: 1.6;
 }
 
 .structured {
@@ -793,7 +807,7 @@ textarea {
   border-radius: 999px;
   padding: 8px 11px;
   font-size: 13px;
-  font-weight: 780;
+  font-weight: 720;
 }
 
 .mode-badge {
@@ -839,9 +853,9 @@ dd {
 .trace-grid div,
 .audit-detail > div {
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 13px;
   padding: 13px;
-  background: #fbfdff;
+  background: #fcfdff;
 }
 
 .trace-grid span,
@@ -875,7 +889,7 @@ dd {
   border: 1px solid #dbe5f2;
   border-radius: 999px;
   padding: 6px 9px;
-  background: #f6f9ff;
+  background: #f7faff;
   color: #34435a;
   font-family: var(--font-mono);
   font-size: 12px;
@@ -903,9 +917,9 @@ dd {
   gap: 5px;
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 13px;
   padding: 13px;
-  background: #fbfdff;
+  background: #fcfdff;
   color: var(--ink);
   text-align: left;
   transition:
