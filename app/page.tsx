@@ -651,7 +651,7 @@ function DemoView({
             <TraceItem label="Policies" value={result.trace.policies.length ? result.trace.policies.map((policy) => `${policy.sourceLabel} ${policy.title}`).join(" | ") : "None - generic route"} />
             <TraceItem label="Constraints" value={result.trace.constraints.join(" ")} />
             <TraceItem label="Restricted topics" value={result.trace.restrictedTopics.join(", ")} />
-            <TraceItem label="Output schema" value={result.trace.outputSchema.join(", ")} />
+            <TraceListItem label="Output schema" values={result.trace.outputSchema} />
           </div>
         ) : (
           <p className="muted">The trace appears after a request and shows the context resolved before the AI call.</p>
@@ -723,6 +723,19 @@ function TraceItem({ label, value }: { label: string; value: string }) {
     <div>
       <span>{label}</span>
       <p>{value}</p>
+    </div>
+  );
+}
+
+function TraceListItem({ label, values }: { label: string; values: string[] }) {
+  return (
+    <div>
+      <span>{label}</span>
+      <ul className="trace-list">
+        {values.map((value) => (
+          <li key={value}>{value}</li>
+        ))}
+      </ul>
     </div>
   );
 }

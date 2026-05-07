@@ -869,6 +869,26 @@ dd {
   line-height: 1.48;
 }
 
+.trace-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trace-list li {
+  border: 1px solid #dbe5f2;
+  border-radius: 999px;
+  padding: 6px 9px;
+  background: #f6f9ff;
+  color: #34435a;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1;
+}
+
 .muted {
   color: var(--muted);
 }
