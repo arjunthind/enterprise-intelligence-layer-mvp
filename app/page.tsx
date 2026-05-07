@@ -120,6 +120,7 @@ export default function Home() {
   const [config, setConfig] = useState<ConfigPayload | null>(null);
   const [draftConfig, setDraftConfig] = useState<ConfigPayload | null>(null);
   const [selectedRole, setSelectedRole] = useState("employee");
+  const [selectedAgent, setSelectedAgent] = useState("automatic");
   const [query, setQuery] = useState(defaultQuery);
   const [mode, setMode] = useState<"demo" | "live">("demo");
   const [activeView, setActiveView] = useState<"demo" | "agents" | "admin" | "audit">("demo");
@@ -197,7 +198,7 @@ export default function Home() {
     const response = await fetch("/api/ask", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query, roleId: selectedRole, compareMode: true, mode })
+      body: JSON.stringify({ query, roleId: selectedRole, agentId: selectedAgent, compareMode: true, mode })
     });
     const payload = (await response.json()) as AskResult;
     setResult(payload);
@@ -304,7 +305,7 @@ export default function Home() {
       <section className="workspace">
         <header className="topbar">
           <div>
-            <p className="eyebrow">{activeView === "demo" ? "Demo Agent: HR Policy Assistant" : activeView === "agents" ? "Use-Case Layer" : activeView === "admin" ? "Governance Controls" : "Governance Log"}</p>
+            <p className="eyebrow">{activeView === "demo" ? "Runtime Routing Demo" : activeView === "agents" ? "Use-Case Layer" : activeView === "admin" ? "Governance Controls" : "Governance Log"}</p>
             <h2>{activeView === "demo" ? "Turn Generic AI Into Governed Enterprise Guidance" : activeView === "agents" ? "Agent Registry and Builder" : activeView === "admin" ? "Tenant Controls for the Active HR Demo" : "Auditable AI Interactions"}</h2>
             {activeView === "demo" ? (
               <p className="topbar-copy">
@@ -332,11 +333,14 @@ export default function Home() {
             config={config}
             roleId={selectedRole}
             roleName={role?.name || "Employee"}
+            agents={registryAgents}
+            selectedAgent={selectedAgent}
             query={query}
             mode={mode}
             result={result}
             loading={loading}
             setRoleId={setSelectedRole}
+            setSelectedAgent={setSelectedAgent}
             setQuery={setQuery}
             setMode={setMode}
             scenarioOpen={scenarioOpen}
@@ -476,11 +480,14 @@ function DemoView({
   config,
   roleId,
   roleName,
+  agents,
+  selectedAgent,
   query,
   mode,
   result,
   loading,
   setRoleId,
+  setSelectedAgent,
   setQuery,
   setMode,
   scenarioOpen,
@@ -490,11 +497,14 @@ function DemoView({
   config: ConfigPayload;
   roleId: string;
   roleName: string;
+  agents: RegistryAgent[];
+  selectedAgent: string;
   query: string;
   mode: "demo" | "live";
   result: AskResult | null;
   loading: boolean;
   setRoleId: (roleId: string) => void;
+  setSelectedAgent: (agentId: string) => void;
   setQuery: (query: string) => void;
   setMode: (mode: "demo" | "live") => void;
   scenarioOpen: boolean;
@@ -510,11 +520,24 @@ function DemoView({
           </button>
           <span>Optional walkthrough prompts for reviewer demos</span>
         </div>
-        <div className="field-row">
+        <div className="field-row routing-row">
           <label>
             Organization
             <select value={config.tenant.id} disabled>
               <option>{config.tenant.tenantName}</option>
+            </select>
+          </label>
+          <label>
+            Agent
+            <select value={selectedAgent} onChange={(event) => setSelectedAgent(event.target.value)}>
+              <option value="automatic">Automatic routing</option>
+              <option value="generic">Generic Assistant</option>
+              {agents.map((agent) => (
+                <option key={agent.id} value={agent.id} disabled={agent.status !== "Active MVP Agent"}>
+                  {agent.name}
+                  {agent.status !== "Active MVP Agent" ? " (preview only)" : ""}
+                </option>
+              ))}
             </select>
           </label>
           <label>
@@ -528,30 +551,32 @@ function DemoView({
             </select>
           </label>
         </div>
-        <div className="mode-control">
-          <div className="mode-row" aria-label="Response mode">
-            <button type="button" className={mode === "demo" ? "selected" : ""} onClick={() => setMode("demo")}>
-              Demo Mode
-            </button>
-            <button type="button" className={mode === "live" ? "selected" : ""} onClick={() => setMode("live")}>
-              Live AI
-            </button>
-          </div>
-          <div className="info-bubble" tabIndex={0} aria-label="Mode information">
-            i
-            <div className="info-popover" role="tooltip">
-              <strong>Demo Mode:</strong> Uses deterministic policy-backed responses for reliable stakeholder review.
-              <strong>Live AI:</strong> Calls OpenAI when API access and billing are configured.
-            </div>
-          </div>
-        </div>
         <label>
           User request
           <textarea value={query} onChange={(event) => setQuery(event.target.value)} rows={4} />
         </label>
-        <button className="primary" disabled={loading}>
-          {loading ? "Generating..." : "Run Intelligence Layer"}
-        </button>
+        <div className="run-controls">
+          <button className="primary" disabled={loading}>
+            {loading ? "Generating..." : "Run Intelligence Layer"}
+          </button>
+          <div className="mode-control">
+            <div className="mode-row" aria-label="Response mode">
+              <button type="button" className={mode === "demo" ? "selected" : ""} onClick={() => setMode("demo")}>
+                Demo Mode
+              </button>
+              <button type="button" className={mode === "live" ? "selected" : ""} onClick={() => setMode("live")}>
+                Live AI
+              </button>
+            </div>
+            <div className="info-bubble" tabIndex={0} aria-label="Mode information">
+              i
+              <div className="info-popover" role="tooltip">
+                <strong>Demo Mode:</strong> Uses deterministic policy-backed responses for reliable stakeholder review.
+                <strong>Live AI:</strong> Calls OpenAI when API access and billing are configured.
+              </div>
+            </div>
+          </div>
+        </div>
       </form>
 
       {scenarioOpen ? (
@@ -574,6 +599,7 @@ function DemoView({
                   className={query === scenario.query && roleId === scenario.roleId ? "selected" : ""}
                   onClick={() => {
                     setRoleId(scenario.roleId);
+                    setSelectedAgent("automatic");
                     setQuery(scenario.query);
                     setScenarioOpen(false);
                   }}
@@ -616,8 +642,9 @@ function DemoView({
         {result?.trace ? (
           <div className="trace-grid">
             <TraceItem label="Tenant" value={`${result.trace.tenant.tenantName} / v${result.trace.tenant.configVersion}`} />
+            <TraceItem label="Selected agent" value={`${result.trace.agent.name} / ${result.trace.agent.routingMode}`} />
             <TraceItem label="Role context" value={`${result.trace.role.name}: ${result.trace.role.permissions.join(", ")}`} />
-            <TraceItem label="Policies" value={result.trace.policies.map((policy) => `${policy.sourceLabel} ${policy.title}`).join(" | ")} />
+            <TraceItem label="Policies" value={result.trace.policies.length ? result.trace.policies.map((policy) => `${policy.sourceLabel} ${policy.title}`).join(" | ") : "None - generic route"} />
             <TraceItem label="Constraints" value={result.trace.constraints.join(" ")} />
             <TraceItem label="Restricted topics" value={result.trace.restrictedTopics.join(", ")} />
             <TraceItem label="Output schema" value={result.trace.outputSchema.join(", ")} />

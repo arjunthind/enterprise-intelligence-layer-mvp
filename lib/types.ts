@@ -46,6 +46,11 @@ export type GovernedResponse = {
 
 export type Trace = {
   tenant: Pick<TenantConfig, "tenantName" | "industry" | "tone" | "configVersion">;
+  agent: {
+    id: string;
+    name: string;
+    routingMode: "Automatic" | "Manual";
+  };
   role: Pick<RoleConfig, "name" | "permissions" | "responseGuidance">;
   policies: Array<Pick<PolicyDocument, "title" | "sourceLabel" | "effectiveDate">>;
   constraints: string[];

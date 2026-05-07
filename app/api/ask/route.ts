@@ -4,7 +4,7 @@ import { buildErrorResponse, findRole, generateComparison, getModel, summarizePr
 import type { AuditEvent } from "@/lib/types";
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as { query?: string; roleId?: string; mode?: "demo" | "live" | "auto" };
+  const body = (await request.json()) as { query?: string; roleId?: string; agentId?: string; mode?: "demo" | "live" | "auto" };
   const query = body.query?.trim();
   if (!query || !body.roleId) {
     return NextResponse.json({ error: "query and roleId are required." }, { status: 400 });
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   const createdAt = new Date().toISOString();
 
   try {
-    const result = await generateComparison(config, role, query, body.mode ?? "auto");
+    const result = await generateComparison(config, role, query, body.mode ?? "auto", body.agentId ?? "automatic");
     const audit: AuditEvent = {
       id,
       query,

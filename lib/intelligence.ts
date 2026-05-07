@@ -1,5 +1,12 @@
 import type { ConfigPayload, GovernedResponse, PolicyDocument, ResponseMode, RoleConfig, Trace } from "./types";
 
+type RoutedAgent = {
+  id: string;
+  name: string;
+  routingMode: "Automatic" | "Manual";
+  kind: "hr" | "generic";
+};
+
 const responseKeys = [
   "answer",
   "supportingRationale",
@@ -26,13 +33,60 @@ export function selectPolicies(config: ConfigPayload, query: string) {
   return config.policies.slice(0, 2);
 }
 
-export function buildTrace(config: ConfigPayload, role: RoleConfig, policies: PolicyDocument[]): Trace {
+export function resolveAgent(config: ConfigPayload, query: string, requestedAgentId = "automatic"): RoutedAgent {
+  const normalized = query.toLowerCase();
+  const hrSignals = [
+    "remote",
+    "work",
+    "employee",
+    "manager",
+    "hr",
+    "policy",
+    "payroll",
+    "tax",
+    "workers compensation",
+    "patient",
+    "security",
+    "state",
+    "job",
+    "documentation",
+    "approve",
+    "approval",
+    "move"
+  ];
+  const isAutomatic = requestedAgentId === "automatic";
+  const isGeneric = requestedAgentId === "generic";
+  const isHr = requestedAgentId === config.agent.id || (isAutomatic && hrSignals.some((signal) => normalized.includes(signal)));
+
+  if (isGeneric || !isHr) {
+    return {
+      id: "generic",
+      name: "Generic Assistant",
+      routingMode: isAutomatic ? "Automatic" : "Manual",
+      kind: "generic"
+    };
+  }
+
+  return {
+    id: config.agent.id,
+    name: config.agent.name,
+    routingMode: isAutomatic ? "Automatic" : "Manual",
+    kind: "hr"
+  };
+}
+
+export function buildTrace(config: ConfigPayload, role: RoleConfig, policies: PolicyDocument[], agent: RoutedAgent): Trace {
   return {
     tenant: {
       tenantName: config.tenant.tenantName,
       industry: config.tenant.industry,
       tone: config.tenant.tone,
       configVersion: config.tenant.configVersion
+    },
+    agent: {
+      id: agent.id,
+      name: agent.name,
+      routingMode: agent.routingMode
     },
     role: {
       name: role.name,
@@ -52,26 +106,40 @@ export function buildTrace(config: ConfigPayload, role: RoleConfig, policies: Po
 }
 
 export function summarizePrompt(config: ConfigPayload, role: RoleConfig, policies: PolicyDocument[]) {
+  return summarizePromptForAgent(config, role, policies, {
+    id: config.agent.id,
+    name: config.agent.name,
+    routingMode: "Manual",
+    kind: "hr"
+  });
+}
+
+function summarizePromptForAgent(config: ConfigPayload, role: RoleConfig, policies: PolicyDocument[], agent: RoutedAgent) {
   return [
     `Tenant ${config.tenant.tenantName} v${config.tenant.configVersion}`,
     `Role ${role.name}`,
-    `Agent ${config.agent.name}`,
-    `Policies ${policies.map((policy) => policy.sourceLabel).join(", ")}`
+    `Agent ${agent.name}`,
+    `Routing ${agent.routingMode}`,
+    `Policies ${policies.length ? policies.map((policy) => policy.sourceLabel).join(", ") : "none"}`
   ].join(" | ");
 }
 
-export async function generateComparison(config: ConfigPayload, role: RoleConfig, query: string, requestedMode: "demo" | "live" | "auto") {
-  const policies = selectPolicies(config, query);
-  const trace = buildTrace(config, role, policies);
+export async function generateComparison(config: ConfigPayload, role: RoleConfig, query: string, requestedMode: "demo" | "live" | "auto", requestedAgentId = "automatic") {
+  const agent = resolveAgent(config, query, requestedAgentId);
+  const policies = agent.kind === "hr" ? selectPolicies(config, query) : [];
+  const trace = buildTrace(config, role, policies, agent);
   const model = getModel();
 
   if (requestedMode === "demo") {
-    return buildDemoComparison(config, role, policies, query, trace, "Demo");
+    return buildDemoComparison(config, role, policies, query, trace, "Demo", agent);
   }
 
   try {
     const genericPromise = callGenericModel(query, model);
-    const governedPromise = callGovernedModel(config, role, policies, query, model);
+    const governedPromise =
+      agent.kind === "generic"
+        ? callGenericStructuredModel(query, model)
+        : callGovernedModel(config, role, policies, query, model);
     const [generic, governed] = await Promise.all([genericPromise, governedPromise]);
 
     return {
@@ -80,13 +148,13 @@ export async function generateComparison(config: ConfigPayload, role: RoleConfig
       trace,
       policyRefs: policies.map((policy) => policy.sourceLabel),
       rawStatus: governed.status,
-      assembledPromptSummary: summarizePrompt(config, role, policies),
+      assembledPromptSummary: summarizePromptForAgent(config, role, policies, agent),
       responseMode: "Live AI" as ResponseMode,
       liveError: null
     };
   } catch (error) {
     if (requestedMode === "live") throw error;
-    const fallback = buildDemoComparison(config, role, policies, query, trace, "Demo fallback");
+    const fallback = buildDemoComparison(config, role, policies, query, trace, "Demo fallback", agent);
     return {
       ...fallback,
       liveError: error instanceof Error ? error.message : "Live AI request failed."
@@ -100,15 +168,19 @@ function buildDemoComparison(
   policies: PolicyDocument[],
   query: string,
   trace: Trace,
-  mode: ResponseMode
+  mode: ResponseMode,
+  agent: RoutedAgent
 ) {
   return {
     genericResponse: buildDemoGenericResponse(query),
-    governedResponse: buildDemoGovernedResponse(config, role, policies, query),
+    governedResponse:
+      agent.kind === "generic"
+        ? buildDemoGenericStructuredResponse(query, agent)
+        : buildDemoGovernedResponse(config, role, policies, query),
     trace,
     policyRefs: policies.map((policy) => policy.sourceLabel),
     rawStatus: mode === "Demo fallback" ? "demo_fallback" : "demo",
-    assembledPromptSummary: summarizePrompt(config, role, policies),
+    assembledPromptSummary: summarizePromptForAgent(config, role, policies, agent),
     responseMode: mode,
     liveError: null
   };
@@ -116,6 +188,14 @@ function buildDemoComparison(
 
 function buildDemoGenericResponse(query: string) {
   const normalizedQuery = query.toLowerCase();
+
+  if (normalizedQuery.includes("9+10") || normalizedQuery.includes("9 + 10")) {
+    return "9 + 10 = 19.";
+  }
+
+  if (normalizedQuery.includes("ww2") || normalizedQuery.includes("world war 2") || normalizedQuery.includes("world war ii")) {
+    return "World War II was a global conflict from 1939 to 1945 involving the Allied and Axis powers. It reshaped international politics, led to the creation of the United Nations, accelerated decolonization, and established the United States and Soviet Union as rival superpowers.";
+  }
 
   if (normalizedQuery.includes("patient data") || normalizedQuery.includes("patient information")) {
     return "Accessing patient data while working remotely can create privacy and security risks, especially if you are using an unsecured network, personal device, or unapproved location. You should follow your company's security policies and check with IT, Security, or Compliance before accessing sensitive information.";
@@ -138,6 +218,26 @@ function buildDemoGenericResponse(query: string) {
   }
 
   return "This depends on your company policy and your specific situation. Check with the relevant internal team before acting.";
+}
+
+function buildDemoGenericStructuredResponse(query: string, agent: RoutedAgent): GovernedResponse {
+  return {
+    answer: buildDemoGenericResponse(query),
+    supportingRationale: `${agent.name} was selected by ${agent.routingMode.toLowerCase()} routing because the request does not require the HR policy assistant's approved Northstar policy context.`,
+    sourceReferences: ["Generic Assistant: no enterprise policy sources applied"],
+    risksOrLimitations: [
+      "This response is not grounded in tenant-specific policy.",
+      "No HR, compliance, payroll, or security approval should be inferred from this answer.",
+      "If the question becomes enterprise-specific, route it to a governed agent."
+    ],
+    recommendedNextSteps: [
+      "Use the HR Policy Assistant for employee mobility, remote work, manager approval, data security, or HR process questions.",
+      "Use Generic Assistant for broad knowledge or simple non-enterprise questions.",
+      "Escalate to an approved enterprise agent when policy, compliance, or internal data is required."
+    ],
+    confidence: "Medium",
+    escalationRequired: false
+  };
 }
 
 function buildDemoGovernedResponse(config: ConfigPayload, role: RoleConfig, policies: PolicyDocument[], query: string): GovernedResponse {
@@ -291,6 +391,54 @@ async function callGenericModel(query: string, model: string) {
     ]
   });
   return extractOutputText(response) || "No generic response was returned.";
+}
+
+async function callGenericStructuredModel(query: string, model: string) {
+  const response = await createResponse({
+    model,
+    input: [
+      {
+        role: "system",
+        content: [
+          "You are Generic Assistant in an enterprise AI routing demo.",
+          "Answer broad, non-enterprise questions helpfully.",
+          "Do not claim access to company policy, internal systems, private documents, HR rules, legal guidance, payroll rules, or compliance approval.",
+          "Return a concise, auditable response in the required schema."
+        ].join("\n")
+      },
+      {
+        role: "user",
+        content: query
+      }
+    ],
+    text: {
+      format: {
+        type: "json_schema",
+        name: "generic_answer",
+        strict: true,
+        schema: {
+          type: "object",
+          additionalProperties: false,
+          required: responseKeys,
+          properties: {
+            answer: { type: "string" },
+            supportingRationale: { type: "string" },
+            sourceReferences: { type: "array", items: { type: "string" } },
+            risksOrLimitations: { type: "array", items: { type: "string" } },
+            recommendedNextSteps: { type: "array", items: { type: "string" } },
+            confidence: { type: "string", enum: ["Low", "Medium", "High"] },
+            escalationRequired: { type: "boolean" }
+          }
+        }
+      }
+    }
+  });
+
+  const parsed = JSON.parse(extractOutputText(response) || "{}") as GovernedResponse;
+  return {
+    response: parsed,
+    status: typeof response.status === "string" ? response.status : "completed"
+  };
 }
 
 async function callGovernedModel(

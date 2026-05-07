@@ -81,6 +81,44 @@ for (const scenario of scenarios) {
   results.push(await runScenario(scenario));
 }
 
+const routingChecks = [
+  {
+    query: "what is 9+10?",
+    expectedAgent: "Generic Assistant",
+    expectedPolicies: 0,
+    expectedAnswer: "19"
+  },
+  {
+    query: "Can I work remotely from another state for 3 months?",
+    expectedAgent: "HR Policy Assistant",
+    expectedPolicies: 1,
+    expectedAnswer: "HR review"
+  }
+];
+
+for (const check of routingChecks) {
+  const response = await fetch(`${baseUrl}/api/ask`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      query: check.query,
+      roleId: "employee",
+      agentId: "automatic",
+      compareMode: true,
+      mode: "demo"
+    })
+  });
+  if (!response.ok) throw new Error(`Automatic routing check returned HTTP ${response.status}`);
+  const payload = await response.json();
+  if (payload.trace?.agent?.name !== check.expectedAgent) {
+    throw new Error(`Automatic routing expected ${check.expectedAgent} but got ${payload.trace?.agent?.name}`);
+  }
+  if ((payload.trace?.policies?.length ?? 0) < check.expectedPolicies) {
+    throw new Error(`Automatic routing expected at least ${check.expectedPolicies} policies for ${check.query}`);
+  }
+  assertIncludes(`Automatic routing response for ${check.query}`, payload.governedResponse?.answer || "", [check.expectedAnswer]);
+}
+
 const auditResponse = await fetch(`${baseUrl}/api/audit`);
 if (!auditResponse.ok) throw new Error(`Audit endpoint returned HTTP ${auditResponse.status}`);
 const auditPayload = await auditResponse.json();
@@ -92,3 +130,4 @@ console.log("Scenario QA passed:");
 for (const result of results) {
   console.log(`- ${result.title} (${result.role}) audit=${result.auditId}`);
 }
+console.log("Automatic routing QA passed.");
