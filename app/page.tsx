@@ -511,6 +511,15 @@ function DemoView({
   setScenarioOpen: (open: boolean) => void;
   ask: (event: FormEvent) => Promise<void>;
 }) {
+  const routedAgent = result?.trace?.agent;
+  const isGenericRoute = routedAgent?.id === "generic";
+  const responseEyebrow = routedAgent
+    ? isGenericRoute
+      ? `${routedAgent.routingMode} route`
+      : `Governed for ${roleName}`
+    : `Governed for ${roleName}`;
+  const responseTitle = isGenericRoute ? routedAgent.name : "Governed AI";
+
   return (
     <div className="stack">
       <form className="query-panel" onSubmit={ask}>
@@ -623,8 +632,8 @@ function DemoView({
         </section>
         <section className="panel governed">
           <div className="panel-heading">
-            <p className="eyebrow">Governed for {roleName}</p>
-            <h3>Governed AI</h3>
+            <p className="eyebrow">{responseEyebrow}</p>
+            <h3>{responseTitle}</h3>
           </div>
           {result?.responseMode ? <div className="mode-badge">Mode: {result.responseMode}</div> : null}
           {result?.liveError ? <p className="inline-warning">Live AI was unavailable, so the MVP used deterministic demo output. Reason: {result.liveError}</p> : null}
