@@ -618,14 +618,14 @@ function DemoView({
 
       <div className="comparison">
         <section className="panel">
-          <div className="panel-heading">
+          <div className="panel-heading response-heading">
             <p className="eyebrow">Baseline</p>
             <h3>Generic AI</h3>
           </div>
           <p className="answer">{result?.genericResponse || "Run the default question to see the unguided model response."}</p>
         </section>
         <section className="panel governed">
-          <div className="panel-heading">
+          <div className="panel-heading response-heading">
             <p className="eyebrow">Governed path</p>
             <h3>Governed AI</h3>
           </div>

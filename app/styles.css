@@ -672,6 +672,12 @@ textarea {
   margin: 0;
 }
 
+.response-heading {
+  display: grid;
+  justify-content: start;
+  gap: 6px;
+}
+
 .trace-heading h3 {
   margin: 0;
 }
