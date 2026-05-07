@@ -681,6 +681,19 @@ textarea {
   background: linear-gradient(180deg, #ffffff 0%, #f8fcfb 100%);
 }
 
+.agent-route {
+  width: fit-content;
+  max-width: 100%;
+  margin: -2px 0 12px;
+  border: 1px solid #d7e3f5;
+  border-radius: 999px;
+  padding: 7px 11px;
+  background: #f6f9ff;
+  color: #526175;
+  font-size: 13px;
+  font-weight: 750;
+}
+
 .scorecard {
   border: 1px solid var(--line);
   border-radius: 14px;

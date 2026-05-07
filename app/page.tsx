@@ -512,13 +512,7 @@ function DemoView({
   ask: (event: FormEvent) => Promise<void>;
 }) {
   const routedAgent = result?.trace?.agent;
-  const isGenericRoute = routedAgent?.id === "generic";
-  const responseEyebrow = routedAgent
-    ? isGenericRoute
-      ? `${routedAgent.routingMode} route`
-      : `Governed for ${roleName}`
-    : `Governed for ${roleName}`;
-  const responseTitle = isGenericRoute ? routedAgent.name : "Governed AI";
+  const agentLine = routedAgent ? `Agent: ${routedAgent.name} / ${routedAgent.routingMode} route` : "Agent: Automatic routing";
 
   return (
     <div className="stack">
@@ -632,9 +626,10 @@ function DemoView({
         </section>
         <section className="panel governed">
           <div className="panel-heading">
-            <p className="eyebrow">{responseEyebrow}</p>
-            <h3>{responseTitle}</h3>
+            <p className="eyebrow">Governed path</p>
+            <h3>Governed AI</h3>
           </div>
+          <p className="agent-route">{agentLine}</p>
           {result?.responseMode ? <div className="mode-badge">Mode: {result.responseMode}</div> : null}
           {result?.liveError ? <p className="inline-warning">Live AI was unavailable, so the MVP used deterministic demo output. Reason: {result.liveError}</p> : null}
           {result ? <StructuredAnswer response={result.governedResponse} /> : <p className="answer">The governed answer will render as a structured, policy-backed response.</p>}
