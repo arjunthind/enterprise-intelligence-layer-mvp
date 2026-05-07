@@ -143,17 +143,18 @@ function buildDemoGenericResponse(query: string) {
 function buildDemoGovernedResponse(config: ConfigPayload, role: RoleConfig, policies: PolicyDocument[], query: string): GovernedResponse {
   const refs = policies.map((policy) => `${policy.sourceLabel}: ${policy.title}`);
   const normalizedQuery = query.toLowerCase();
+  const tenantLens = buildTenantControlLens(config);
 
   if (normalizedQuery.includes("patient data") || normalizedQuery.includes("patient information")) {
-    return {
+    return applyTenantControlLens(config, tenantLens, {
       answer:
-        "Accessing patient data while working remotely from another state should be treated as a high-risk request. Northstar policy requires company-managed devices, approved VPN, multifactor authentication, private networks, and Security review before accessing patient information from an unapproved location.",
+        `Accessing patient data while working remotely from another state should be treated as a high-risk request. ${config.tenant.tenantName} policy requires company-managed devices, approved VPN, multifactor authentication, private networks, and Security review before accessing patient information from an unapproved location.`,
       supportingRationale: `${config.tenant.tenantName}'s Data Security Addendum applies because the request involves patient data and remote access from another state. The Intelligence Layer prioritizes security and compliance constraints over general remote-work flexibility.`,
       sourceReferences: refs,
       risksOrLimitations: [
         "Patient information may trigger privacy, security, and regulated-data handling obligations.",
         "Access from an unapproved state, public network, or personal device may violate policy.",
-        "This MVP uses fictional Northstar policy data for demonstration and is not legal, security, or compliance advice."
+        `This MVP uses fictional ${config.tenant.tenantName} policy data for demonstration and is not legal, security, or compliance advice.`
       ],
       recommendedNextSteps: [
         "Confirm the work location, device type, network, VPN, and multifactor authentication setup.",
@@ -162,11 +163,11 @@ function buildDemoGovernedResponse(config: ConfigPayload, role: RoleConfig, poli
       ],
       confidence: "High",
       escalationRequired: true
-    };
+    });
   }
 
   if (normalizedQuery.includes("documentation") || normalizedQuery.includes("what should hr collect")) {
-    return {
+    return applyTenantControlLens(config, tenantLens, {
       answer:
         "HR should collect the destination state, exact remote-work dates, job duties, manager acknowledgement, whether patient or regulated data will be accessed, and any payroll, tax, workers compensation, licensing, or security considerations before approval.",
       supportingRationale: `${config.tenant.tenantName}'s Remote Work Policy requires HR review for temporary out-of-state work beyond 30 calendar days. The Employee Mobility Checklist defines the minimum intake details needed before approval.`,
@@ -183,13 +184,13 @@ function buildDemoGovernedResponse(config: ConfigPayload, role: RoleConfig, poli
       ],
       confidence: "High",
       escalationRequired: true
-    };
+    });
   }
 
   if (normalizedQuery.includes("move wherever") || normalizedQuery.includes("keep my current job")) {
-    return {
+    return applyTenantControlLens(config, tenantLens, {
       answer:
-        "No. The employee should not assume they can move anywhere and keep the same job without prior approval. The request does not name a specific state, date range, or work arrangement, and Northstar location changes can require HR, payroll, tax, workers compensation, licensing, manager, and security review.",
+        `No. The employee should not assume they can move anywhere and keep the same job without prior approval. The request does not name a specific state, date range, or work arrangement, and ${config.tenant.tenantName} location changes can require HR, payroll, tax, workers compensation, licensing, manager, and security review.`,
       supportingRationale: `${config.tenant.tenantName}'s policy does not provide blanket approval for unrestricted relocation. Because the question lacks a specific state, dates, role impact, and data-access details, the governed response must be cautious and escalation-oriented.`,
       sourceReferences: refs,
       risksOrLimitations: [
@@ -204,28 +205,28 @@ function buildDemoGovernedResponse(config: ConfigPayload, role: RoleConfig, poli
       ],
       confidence: "High",
       escalationRequired: true
-    };
+    });
   }
 
   const roleSpecific = {
     Employee:
-      "You should not assume approval for a three-month out-of-state remote arrangement. Northstar allows routine remote flexibility from an approved home state, but out-of-state remote work beyond 30 calendar days requires HR review before approval.",
+      `You should not assume approval for a three-month out-of-state remote arrangement. ${config.tenant.tenantName} allows routine remote flexibility from an approved home state, but out-of-state remote work beyond 30 calendar days requires HR review before approval.`,
     Manager:
-      "You can consider the request, but you should not approve it directly. A three-month out-of-state arrangement crosses Northstar's 30-day threshold and needs HR review, plus confirmation that team coverage and role duties remain workable.",
+      `You can consider the request, but you should not approve it directly. A three-month out-of-state arrangement crosses ${config.tenant.tenantName}'s 30-day threshold and needs HR review, plus confirmation that team coverage and role duties remain workable.`,
     "HR Admin":
       "This request requires HR intake and cross-functional review before approval. The employee should provide location, dates, duties, manager acknowledgement, and whether regulated data or patient information will be accessed.",
     Compliance:
       "This request presents payroll, state employment, workers compensation, and data security review requirements. It should remain pending until HR, payroll, and security controls are documented."
   }[role.name];
 
-  return {
+  return applyTenantControlLens(config, tenantLens, {
     answer: roleSpecific,
     supportingRationale: `${config.tenant.tenantName}'s Remote Work Policy permits routine flexibility from an approved home state, while temporary out-of-state work beyond 30 calendar days requires HR review. The request is for three months, so the Intelligence Layer applies the mobility checklist and data security constraints before answering.`,
     sourceReferences: refs,
     risksOrLimitations: [
       "Payroll registration, state tax withholding, workers compensation, and benefits eligibility may be affected.",
       "Access to patient information or sensitive systems from an unapproved location may require Security review.",
-      "This MVP uses fictional Northstar policy data for demonstration and is not legal, tax, or HR advice."
+      `This MVP uses fictional ${config.tenant.tenantName} policy data for demonstration and is not legal, tax, or HR advice.`
     ],
     recommendedNextSteps: [
       "Submit the temporary out-of-state remote work request to HR before making travel plans.",
@@ -234,6 +235,44 @@ function buildDemoGovernedResponse(config: ConfigPayload, role: RoleConfig, poli
     ],
     confidence: "High",
     escalationRequired: true
+  });
+}
+
+function buildTenantControlLens(config: ConfigPayload) {
+  const constraints = config.tenant.constraints.map((item) => item.trim()).filter(Boolean);
+  const restrictedTopics = config.tenant.restrictedTopics.map((item) => item.trim()).filter(Boolean);
+  return {
+    tone: config.tenant.tone.trim(),
+    primaryConstraint: constraints[0],
+    allConstraints: constraints,
+    restrictedTopics,
+    configVersion: config.tenant.configVersion
+  };
+}
+
+function applyTenantControlLens(config: ConfigPayload, lens: ReturnType<typeof buildTenantControlLens>, response: GovernedResponse): GovernedResponse {
+  const risksOrLimitations = [...response.risksOrLimitations];
+  const recommendedNextSteps = [...response.recommendedNextSteps];
+  const sourceReferences = [...response.sourceReferences, `Tenant Config v${lens.configVersion}: ${config.tenant.tone}`];
+
+  if (lens.primaryConstraint) {
+    risksOrLimitations.unshift(`Tenant rule applied: ${lens.primaryConstraint}`);
+  }
+
+  if (lens.restrictedTopics.length) {
+    risksOrLimitations.push(`Restricted topics checked: ${lens.restrictedTopics.join(", ")}.`);
+  }
+
+  if (lens.allConstraints.length > 1) {
+    recommendedNextSteps.push(`Review against tenant constraints: ${lens.allConstraints.slice(0, 3).join(" ")}`);
+  }
+
+  return {
+    ...response,
+    supportingRationale: `${response.supportingRationale} Demo Mode also applies the current Tenant Controls: tone is "${lens.tone || "not specified"}" and config version is v${lens.configVersion}.`,
+    sourceReferences,
+    risksOrLimitations,
+    recommendedNextSteps
   };
 }
 
