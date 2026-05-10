@@ -156,18 +156,18 @@ export default function Home() {
   }, [loadAudits]);
 
   useEffect(() => {
-    const savedAgents = window.localStorage.getItem("intelligence-layer-agents");
+    const savedAgents = window.localStorage.getItem("control-hub-agents");
     if (!savedAgents) return;
     try {
       setCustomAgents(dedupeAgents(JSON.parse(savedAgents) as RegistryAgent[]));
     } catch {
-      window.localStorage.removeItem("intelligence-layer-agents");
+      window.localStorage.removeItem("control-hub-agents");
       setCustomAgents([]);
     }
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem("intelligence-layer-agents", JSON.stringify(customAgents));
+    window.localStorage.setItem("control-hub-agents", JSON.stringify(customAgents));
   }, [customAgents]);
 
   const registryAgents = useMemo<RegistryAgent[]>(() => {
@@ -257,7 +257,7 @@ export default function Home() {
     };
     const duplicateExists = registryAgents.some((agent) => agentRegistryKey(agent) === agentRegistryKey(nextAgent));
     if (duplicateExists) {
-      setStatus(`${nextAgent.name} is already in the Agent Registry, so no duplicate was created.`);
+      setStatus(`${nextAgent.name} is already in the Agent Catalog, so no duplicate was created.`);
       return;
     }
     setCustomAgents((agents) => dedupeAgents([nextAgent, ...agents]));
@@ -266,11 +266,11 @@ export default function Home() {
       name: "",
       purpose: ""
     });
-    setStatus(`${nextAgent.name} added to the Agent Registry as a configured preview.`);
+    setStatus(`${nextAgent.name} added to the Agent Catalog as a configured preview.`);
   }
 
   if (!config || !draftConfig) {
-    return <main className="loading">Loading Intelligence Layer...</main>;
+    return <main className="loading">Loading Enterprise AI Control Hub...</main>;
   }
 
   return (
@@ -278,7 +278,7 @@ export default function Home() {
       <aside className="sidebar">
         <div>
           <p className="eyebrow">MVP Prototype</p>
-          <h1>Enterprise Intelligence Layer</h1>
+          <h1>Enterprise AI Control Hub</h1>
           <p className="sidebar-copy">Runtime context, rules, and structured outputs for reliable enterprise AI.</p>
         </div>
         <nav>
@@ -286,7 +286,7 @@ export default function Home() {
             Demo
           </button>
           <button className={activeView === "agents" ? "active" : ""} onClick={() => setActiveView("agents")}>
-            Agent Registry
+            Agent Catalog
           </button>
           <button className={activeView === "admin" ? "active" : ""} onClick={() => setActiveView("admin")}>
             Tenant Controls
@@ -305,8 +305,8 @@ export default function Home() {
       <section className="workspace">
         <header className="topbar">
           <div>
-            <p className="eyebrow">{activeView === "demo" ? "Runtime Routing Demo" : activeView === "agents" ? "Use-Case Layer" : activeView === "admin" ? "Governance Controls" : "Governance Log"}</p>
-            <h2>{activeView === "demo" ? "Turn Generic AI Into Governed Enterprise Guidance" : activeView === "agents" ? "Agent Registry and Builder" : activeView === "admin" ? "Tenant Controls for the Active HR Demo" : "Auditable AI Interactions"}</h2>
+            <p className="eyebrow">{activeView === "demo" ? "Runtime Routing Demo" : activeView === "agents" ? "Agent Catalog" : activeView === "admin" ? "Governance Controls" : "Governance Log"}</p>
+            <h2>{activeView === "demo" ? "Turn Generic AI Into Governed Enterprise Guidance" : activeView === "agents" ? "Agent Catalog and Builder" : activeView === "admin" ? "Tenant Controls for the Active HR Demo" : "Auditable AI Interactions"}</h2>
             {activeView === "demo" ? (
               <p className="topbar-copy">
                 This MVP uses HR as the first proof-of-value agent to demonstrate tenant context, role awareness, policy retrieval, and structured governance.
@@ -314,7 +314,7 @@ export default function Home() {
             ) : null}
             {activeView === "agents" ? (
               <p className="topbar-copy">
-                The registry shows how the Intelligence Layer can support repeatable agents defined by purpose, roles, approved sources, constraints, and output expectations.
+                The catalog shows how the Control Hub can support repeatable agents defined by purpose, roles, approved sources, constraints, and output expectations.
               </p>
             ) : null}
             {activeView === "admin" ? (
@@ -560,7 +560,7 @@ function DemoView({
         </label>
         <div className="run-controls">
           <button className="primary" disabled={loading}>
-            {loading ? "Generating..." : "Run Intelligence Layer"}
+            {loading ? "Generating..." : "Run Governed AI"}
           </button>
           <div className="mode-control">
             <div className="mode-row" aria-label="Response mode">
@@ -641,7 +641,7 @@ function DemoView({
       <section className="trace">
         <div className="trace-heading">
           <p className="eyebrow">Runtime Decision Layer</p>
-          <h3>Intelligence Layer Trace</h3>
+          <h3>Control Hub Trace</h3>
         </div>
         {result?.trace ? (
           <div className="trace-grid">
@@ -825,7 +825,7 @@ function AdminView({
 
       <section className="panel">
         <h3>Active Agent Purpose</h3>
-        <p className="muted">This edits the purpose of the HR Policy Assistant used in the working demo. New agent concepts belong in the Agent Registry.</p>
+        <p className="muted">This edits the purpose of the HR Policy Assistant used in the working demo. New agent concepts belong in the Agent Catalog.</p>
         <label>
           HR Policy Assistant purpose
           <textarea

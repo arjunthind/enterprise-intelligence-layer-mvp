@@ -1,15 +1,15 @@
-# Enterprise Intelligence Layer MVP
+# Enterprise AI Control Hub MVP
 
 A Vercel-ready interactive MVP for a governed enterprise AI orchestration layer. The demo shows a fictional HR Policy Assistant for Northstar Health Systems and compares a generic AI answer with a governed, role-aware, policy-backed answer.
 
-For a polished product write-up, see [Overview of MVP for Intelligence Layer Platform](docs/intelligence-layer-mvp-overview.md).
+For a polished product write-up, see [Overview of MVP for Enterprise AI Control Hub](docs/enterprise-ai-control-hub-mvp-overview.md).
 
 ## What It Demonstrates
 
 - Tenant rulebook injection
 - Role-aware response behavior
 - Approved policy context retrieval
-- Agent Registry with a lightweight Create Agent preview flow
+- Agent Catalog with a lightweight Create Agent preview flow
 - OpenAI Responses API calls with Structured Outputs
 - Tenant Controls for editing the active HR demo rulebook, role guidance, policy snippets, and agent purpose
 - Auditable interaction history
@@ -56,6 +56,6 @@ The app creates its Postgres tables automatically on first read/write:
 2. Select a role: Employee, Manager, HR Admin, or Compliance.
 3. Run “Can I work remotely from another state for 3 months?”
 4. Compare Generic AI vs Governed AI.
-5. Review the Intelligence Layer Trace.
+5. Review the Control Hub Trace.
 6. Edit tenant rules or policy snippets on the Tenant Controls tab.
 7. Rerun the question and inspect the Audit tab.

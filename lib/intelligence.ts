@@ -249,7 +249,7 @@ function buildDemoGovernedResponse(config: ConfigPayload, role: RoleConfig, poli
     return applyTenantControlLens(config, tenantLens, {
       answer:
         `Accessing patient data while working remotely from another state should be treated as a high-risk request. ${config.tenant.tenantName} policy requires company-managed devices, approved VPN, multifactor authentication, private networks, and Security review before accessing patient information from an unapproved location.`,
-      supportingRationale: `${config.tenant.tenantName}'s Data Security Addendum applies because the request involves patient data and remote access from another state. The Intelligence Layer prioritizes security and compliance constraints over general remote-work flexibility.`,
+      supportingRationale: `${config.tenant.tenantName}'s Data Security Addendum applies because the request involves patient data and remote access from another state. The Control Hub prioritizes security and compliance constraints over general remote-work flexibility.`,
       sourceReferences: refs,
       risksOrLimitations: [
         "Patient information may trigger privacy, security, and regulated-data handling obligations.",
@@ -321,7 +321,7 @@ function buildDemoGovernedResponse(config: ConfigPayload, role: RoleConfig, poli
 
   return applyTenantControlLens(config, tenantLens, {
     answer: roleSpecific,
-    supportingRationale: `${config.tenant.tenantName}'s Remote Work Policy permits routine flexibility from an approved home state, while temporary out-of-state work beyond 30 calendar days requires HR review. The request is for three months, so the Intelligence Layer applies the mobility checklist and data security constraints before answering.`,
+    supportingRationale: `${config.tenant.tenantName}'s Remote Work Policy permits routine flexibility from an approved home state, while temporary out-of-state work beyond 30 calendar days requires HR review. The request is for three months, so the Control Hub applies the mobility checklist and data security constraints before answering.`,
     sourceReferences: refs,
     risksOrLimitations: [
       "Payroll registration, state tax withholding, workers compensation, and benefits eligibility may be affected.",

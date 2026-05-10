@@ -1,4 +1,4 @@
-# Overview of MVP for Intelligence Layer Platform
+# Overview of MVP for Enterprise AI Control Hub
 
 ## Executive Summary
 
@@ -6,7 +6,7 @@ Enterprise AI often fails in production for a consistent reason: it is too gener
 
 Large language models are powerful, but by default they do not understand a specific organization’s operating context, user roles, compliance constraints, internal policies, or preferred response structure. Without that context, AI responses can become inconsistent, difficult to trust, and hard to govern at scale.
 
-The proposed solution is an **Enterprise Intelligence Layer**: a lightweight orchestration layer that sits between enterprise systems, users, and AI models. Its purpose is to transform generic AI into enterprise-aware, governed, and auditable AI by injecting the right context, rules, and response structure before an answer is generated.
+The proposed solution is an **Enterprise AI Control Hub**: a lightweight orchestration layer that sits between enterprise systems, users, and AI models. Its purpose is to transform generic AI into enterprise-aware, governed, and auditable AI by injecting the right context, rules, and response structure before an answer is generated.
 
 This MVP is not intended to be a full enterprise platform. It is a focused proof of value that demonstrates one core idea:
 
@@ -18,7 +18,7 @@ The MVP demonstrates this through a single use case: an **HR Policy Assistant** 
 
 The MVP focuses on one practical enterprise use case: helping employees and internal stakeholders answer HR policy questions related to temporary out-of-state remote work.
 
-This use case was selected because it clearly exposes the problem the Intelligence Layer is designed to solve. A generic AI assistant may provide a plausible but vague answer. A governed enterprise assistant must consider company policy, the user’s role, compliance risk, approved data sources, escalation requirements, and a consistent output format.
+This use case was selected because it clearly exposes the problem the Control Hub is designed to solve. A generic AI assistant may provide a plausible but vague answer. A governed enterprise assistant must consider company policy, the user’s role, compliance risk, approved data sources, escalation requirements, and a consistent output format.
 
 The selected demo question is:
 
@@ -37,9 +37,9 @@ To keep the MVP focused, it intentionally does **not** attempt to include:
 
 Northstar Health Systems is fictional, and the policy content is sample data created for demonstration purposes.
 
-## How the Intelligence Layer Works
+## How the Enterprise AI Control Hub Works
 
-At runtime, the Intelligence Layer follows a structured flow before generating an answer:
+At runtime, the Control Hub follows a structured flow before generating an answer:
 
 1. A user submits a policy question.
 2. The system resolves the selected tenant, role, and agent.
@@ -88,7 +88,7 @@ For the HR Policy Assistant, the Context Engine considers:
 - Which constraints apply to the request
 - Which source references should be included
 
-This is the core differentiator of the Intelligence Layer. The value is not only in generating a response, but in resolving the right context before the response is generated.
+This is the core differentiator of the Control Hub. The value is not only in generating a response, but in resolving the right context before the response is generated.
 
 ### Prompt Assembly
 
@@ -104,9 +104,9 @@ Instead of relying on a generic prompt, the MVP constructs an instruction that r
 
 This shows how prompt management can become an enterprise control surface rather than a one-off implementation detail.
 
-### Agent Registry
+### Agent Catalog
 
-The Agent Registry represents the use-case layer of the platform. Each agent has a defined purpose, approved data sources, and expected output behavior.
+The Agent Catalog represents the use-case layer of the platform. Each agent has a defined purpose, approved data sources, and expected output behavior.
 
 The MVP includes one selected agent:
 
@@ -164,7 +164,7 @@ An administrator can edit:
 - Policy snippets
 - Agent purpose
 
-This supports one of the MVP’s key success criteria: tenant-level governance control without engineering changes. The Agent Registry defines reusable agent concepts, while Tenant Controls adjust how the active Northstar HR use case behaves.
+This supports one of the MVP’s key success criteria: tenant-level governance control without engineering changes. The Agent Catalog defines reusable agent concepts, while Tenant Controls adjust how the active Northstar HR use case behaves.
 
 ### Audit Log
 
@@ -222,13 +222,13 @@ The expected outcome is a response that is:
 - Risk-aware
 - Auditable
 
-This is the core demonstration of the Intelligence Layer: the system does not merely answer the question. It shapes the response according to enterprise context and governance requirements.
+This is the core demonstration of the Control Hub: the system does not merely answer the question. It shapes the response according to enterprise context and governance requirements.
 
 ## Business Value and Success Criteria
 
-The Intelligence Layer directly addresses several barriers to enterprise AI adoption.
+The Control Hub directly addresses several barriers to enterprise AI adoption.
 
-| Enterprise AI Problem | Intelligence Layer Impact |
+| Enterprise AI Problem | Control Hub Impact |
 | --- | --- |
 | Inconsistent responses | Standardized output structure |
 | Lack of trust | Policy-backed and source-referenced answers |
@@ -248,7 +248,7 @@ The MVP is successful if it demonstrates:
 
 ## Long-Term Vision
 
-If validated, the Intelligence Layer can expand beyond the HR Policy Assistant into a broader enterprise AI governance platform.
+If validated, the Control Hub can expand beyond the HR Policy Assistant into a broader enterprise AI governance platform.
 
 Future capabilities could include:
 
@@ -266,6 +266,6 @@ The long-term opportunity is to give enterprises a repeatable control layer for 
 
 The future of enterprise AI is not only about better models. It is about better control, context, and governance.
 
-This MVP demonstrates how an Intelligence Layer can transform a generic AI interaction into an enterprise-aware workflow: one that understands the organization, adapts to the user’s role, applies policy context, enforces structure, and creates an audit trail.
+This MVP demonstrates how an Enterprise AI Control Hub can transform a generic AI interaction into an enterprise-aware workflow: one that understands the organization, adapts to the user’s role, applies policy context, enforces structure, and creates an audit trail.
 
 The result is a focused proof of value for operationalizing AI in a way that is more reliable, governed, and enterprise-ready.

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./styles.css";
 
 export const metadata: Metadata = {
-  title: "Enterprise Intelligence Layer MVP",
+  title: "Enterprise AI Control Hub MVP",
   description: "A governed AI orchestration prototype for enterprise HR policy support."
 };
 
